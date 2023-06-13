@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: deploy
-        run: flyctl deploy --config ./fly.api.toml --wait-timeout 5m
+        run: flyctl deploy --config ./fly.api.toml --wait-timeout 300
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
