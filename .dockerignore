@@ -1,0 +1,4 @@
+/target
+README.md
+fly.api.toml
+fly.worker.toml

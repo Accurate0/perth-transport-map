@@ -1,0 +1,27 @@
+name: deploy
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  pta-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: build & deploy
+        run: fly deploy --config ./fly.api.toml --local-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  pta-worker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: build & deploy
+        run: fly deploy --config ./fly.worker.toml --local-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

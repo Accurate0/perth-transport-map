@@ -1,0 +1,10 @@
+pub const CONFIG_PREFIX: &str = "PTA";
+pub const PUBSUB_CHANNEL_GENERAL_IN: &str = "pta_in";
+pub const PUBSUB_CHANNEL_OUT_PREFIX: &str = "pta_out";
+pub const PUBSUB_CHANNEL_WORKER_TASK_OUT: &str = "pta_worker_out";
+pub const PUBSUB_CHANNEL_WORKER_HEALTH_IN: &str = "pta_worker_health_in";
+pub const PUBSUB_CHANNEL_WORKER_HEALTH_OUT: &str = "pta_worker_health_out";
+pub const TRANSPERTH_REAL_TIME_API: &str = "https://realtime.transperth.info/SJP/Trip";
+pub const TRANSPERTH_ROUTE_ENDPOINT: &str = "https://au-journeyplanner.silverrail.io/journeyplannerservice/v2/REST/DataSets/PerthRestricted/Routes";
+pub const TRANSPERTH_TIMETABLE_ENDPOINT: &str = "https://au-journeyplanner.silverrail.io/journeyplannerservice/v2/REST/DataSets/PerthRestricted/Timetable";
+pub const TRANSPERTH_TRIP_LOOKUP: &str = "https://serviceinformation.transperth.info/api/TripInfo";

@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  pta-api:
+    env_file:
+      - .env
+    build:
+      dockerfile: ./pta-api/Dockerfile
+      args:
+        BUILD_MODE: dev
+        BUILD_DIRECTORY: debug
+    container_name: pta-api
+    environment:
+      - PTA_REDIS_CONNECTION_STRING=redis://redis-connection
+    depends_on:
+      - redis
+    links:
+      - redis:redis-connection
+    ports:
+      - 8000:8000
+
+  pta-worker:
+    env_file:
+    - .env
+    build:
+      dockerfile: ./pta-worker/Dockerfile
+      args:
+        BUILD_MODE: dev
+        BUILD_DIRECTORY: debug
+    container_name: pta-worker
+    environment:
+      - PTA_REDIS_CONNECTION_STRING=redis://redis-connection
+    depends_on:
+      - redis
+    links:
+      - redis:redis-connection
+
+  redis:
+    image: redis:alpine
+    container_name: redis

@@ -1,0 +1,8 @@
+app = "pta-worker"
+primary_region = "syd"
+
+[build]
+dockerfile = "./pta-worker/Dockerfile"
+
+[env]
+PTA_REDIS_CONNECTION_STRING = "redis://syd.pta-redis.internal"
