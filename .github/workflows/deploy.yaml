@@ -14,12 +14,18 @@ env:
 jobs:
   build-and-push-image-pta-api:
     uses: ./.github/workflows/build-and-push-image.yaml
+    permissions:
+      contents: read
+      packages: write
     with:
       image-name: pta-api
     secrets: inherit
 
   build-and-push-image-pta-worker:
     uses: ./.github/workflows/build-and-push-image.yaml
+    permissions:
+      contents: read
+      packages: write
     with:
       image-name: pta-worker
     secrets: inherit
