@@ -39,7 +39,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: "{{defaultContext}}:pta-api"
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -73,7 +73,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: "{{defaultContext}}:pta-worker"
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
