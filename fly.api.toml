@@ -1,9 +1,9 @@
-app = "pta-api"
+app = "perthtransport-api"
 primary_region = "syd"
 
 [build]
 image = "ghcr.io/Accurate0:pta-api"
-# dockerfile = "./pta-api/Dockerfile"
+# dockerfile = "./perthtransport-api/Dockerfile"
 
 [http_service]
 internal_port = 8000
@@ -23,4 +23,4 @@ timeout = "10s"
 type = "http"
 
 [env]
-PTA_REDIS_CONNECTION_STRING = "redis://syd.pta-redis.internal"
+PTA_REDIS_CONNECTION_STRING = "redis://syd.perthtransport-redis.internal"

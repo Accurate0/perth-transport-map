@@ -1,9 +1,9 @@
-app = "pta-worker"
+app = "perthtransport-worker"
 primary_region = "syd"
 
 [build]
-image = "ghcr.io/Accurate0:pta-worker"
-# dockerfile = "./pta-worker/Dockerfile"
+image = "ghcr.io/Accurate0:perthtransport-worker"
+# dockerfile = "./perthtransport-worker/Dockerfile"
 
 [env]
-PTA_REDIS_CONNECTION_STRING = "redis://syd.pta-redis.internal"
+PTA_REDIS_CONNECTION_STRING = "redis://syd.perthtransport-redis.internal"

@@ -1,14 +1,14 @@
 version: '3.8'
 services:
-  pta-api:
+  perthtransport-api:
     env_file:
       - .env
     build:
-      dockerfile: ./pta-api/Dockerfile
+      dockerfile: ./perthtransport-api/Dockerfile
       args:
         BUILD_MODE: dev
         BUILD_DIRECTORY: debug
-    container_name: pta-api
+    container_name: perthtransport-api
     environment:
       - PTA_REDIS_CONNECTION_STRING=redis://redis-connection
     depends_on:
@@ -18,15 +18,15 @@ services:
     ports:
       - 8000:8000
 
-  pta-worker:
+  perthtransport-worker:
     env_file:
       - .env
     build:
-      dockerfile: ./pta-worker/Dockerfile
+      dockerfile: ./perthtransport-worker/Dockerfile
       args:
         BUILD_MODE: dev
         BUILD_DIRECTORY: debug
-    container_name: pta-worker
+    container_name: perthtransport-worker
     environment:
       - PTA_REDIS_CONNECTION_STRING=redis://redis-connection
     depends_on:

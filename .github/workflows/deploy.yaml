@@ -12,26 +12,26 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  build-pta-api:
+  build-perthtransport-api:
     uses: ./.github/workflows/build-and-push-image.yaml
     permissions:
       contents: read
       packages: write
     with:
-      image-name: pta-api
+      image-name: perthtransport-api
     secrets: inherit
 
-  build-pta-worker:
+  build-perthtransport-worker:
     uses: ./.github/workflows/build-and-push-image.yaml
     permissions:
       contents: read
       packages: write
     with:
-      image-name: pta-worker
+      image-name: perthtransport-worker
     secrets: inherit
 
-  deploy-pta-api:
-    needs: build-pta-api
+  deploy-perthtransport-api:
+    needs: build-perthtransport-api
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -41,8 +41,8 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-  deploy-pta-worker:
-    needs: build-pta-worker
+  deploy-perthtransport-worker:
+    needs: build-perthtransport-worker
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

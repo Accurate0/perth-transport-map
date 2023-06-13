@@ -1,10 +1,10 @@
 [package]
-name = "pta-worker"
+name = "perthtransport-worker"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-pta = { path = "../pta-lib" }
+perthtransport = { path = "../perthtransport-lib" }
 
 config = "0.13.3"
 redis = { version = "0.23.0", features = ["tokio-comp", "aio"] }
