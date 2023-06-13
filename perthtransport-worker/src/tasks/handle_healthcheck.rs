@@ -1,5 +1,7 @@
 use crate::task_manager::TaskManager;
-use pta::{constants::PUBSUB_CHANNEL_WORKER_HEALTH_OUT, types::health::WorkerHealthStatus};
+use perthtransport::{
+    constants::PUBSUB_CHANNEL_WORKER_HEALTH_OUT, types::health::WorkerHealthStatus,
+};
 use redis::AsyncCommands;
 use std::sync::Arc;
 use tokio::{sync::RwLock, task::JoinHandle};

@@ -1,6 +1,6 @@
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema};
 use chrono::{DateTime, Utc};
-use pta::{
+use perthtransport::{
     constants::{TRANSPERTH_ROUTE_ENDPOINT, TRANSPERTH_TIMETABLE_ENDPOINT, TRANSPERTH_TRIP_LOOKUP},
     types::{
         config::ApplicationConfig,

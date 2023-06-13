@@ -1,14 +1,13 @@
-use std::time::Duration;
-
 use crate::types::{AppState, ServiceUnavailable};
 use axum::extract::State;
 use futures_util::StreamExt;
 use http::StatusCode;
-use pta::{
+use perthtransport::{
     constants::{PUBSUB_CHANNEL_WORKER_HEALTH_IN, PUBSUB_CHANNEL_WORKER_HEALTH_OUT},
     types::health::WorkerHealthStatus,
 };
 use redis::AsyncCommands;
+use std::time::Duration;
 
 pub async fn health_check(State(state): State<AppState>) -> Result<StatusCode, ServiceUnavailable> {
     let mut pubsub = state.redis.get_async_connection().await?.into_pubsub();

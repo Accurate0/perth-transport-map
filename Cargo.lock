@@ -1122,6 +1122,76 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b2a4787296e9989611394c33f193f676704af1686e70b8f8033ab5ba9a35a94"
 
 [[package]]
+name = "perthtransport"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-graphql",
+ "chrono",
+ "config",
+ "log",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "perthtransport-api"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-graphql",
+ "async-graphql-axum",
+ "axum",
+ "chrono",
+ "chrono-tz",
+ "config",
+ "futures-util",
+ "http",
+ "perthtransport",
+ "redis",
+ "reqwest",
+ "reqwest-middleware",
+ "reqwest-tracing",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+]
+
+[[package]]
+name = "perthtransport-worker"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64 0.21.2",
+ "chrono",
+ "chrono-tz",
+ "config",
+ "futures-util",
+ "http",
+ "lazy_static",
+ "perthtransport",
+ "rand 0.8.5",
+ "redis",
+ "reqwest",
+ "reqwest-middleware",
+ "reqwest-tracing",
+ "rust-crypto",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "pest"
 version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1258,76 +1328,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dec2b086b7a862cf4de201096214fa870344cf922b2b30c167badb3af3195406"
 dependencies = [
  "unicode-ident",
-]
-
-[[package]]
-name = "pta"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-graphql",
- "chrono",
- "config",
- "log",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "pta-api"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-graphql",
- "async-graphql-axum",
- "axum",
- "chrono",
- "chrono-tz",
- "config",
- "futures-util",
- "http",
- "pta",
- "redis",
- "reqwest",
- "reqwest-middleware",
- "reqwest-tracing",
- "serde",
- "serde_json",
- "tokio",
- "tower",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "uuid",
-]
-
-[[package]]
-name = "pta-worker"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "base64 0.21.2",
- "chrono",
- "chrono-tz",
- "config",
- "futures-util",
- "http",
- "lazy_static",
- "pta",
- "rand 0.8.5",
- "redis",
- "reqwest",
- "reqwest-middleware",
- "reqwest-tracing",
- "rust-crypto",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]

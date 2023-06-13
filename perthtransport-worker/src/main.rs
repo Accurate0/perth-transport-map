@@ -1,6 +1,6 @@
 use futures_util::StreamExt;
 use http::header::{ACCEPT_ENCODING, CONTENT_TYPE, HOST, USER_AGENT};
-use pta::constants::{PUBSUB_CHANNEL_GENERAL_IN, PUBSUB_CHANNEL_WORKER_HEALTH_IN};
+use perthtransport::constants::{PUBSUB_CHANNEL_GENERAL_IN, PUBSUB_CHANNEL_WORKER_HEALTH_IN};
 use reqwest::header::HeaderMap;
 use reqwest_tracing::TracingMiddleware;
 use std::sync::Arc;
@@ -16,8 +16,8 @@ mod tasks;
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
-    pta::log::init_logger();
-    let config = Arc::new(pta::config::get_application_config()?);
+    perthtransport::log::init_logger();
+    let config = Arc::new(perthtransport::config::get_application_config()?);
     let redis = redis::Client::open(config.redis_connection_string.clone())?;
 
     let redis_multiplexed = Arc::new(RwLock::new(redis.get_multiplexed_async_connection().await?));

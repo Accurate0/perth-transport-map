@@ -1,7 +1,7 @@
 use crate::auth::generate_realtime_auth_header;
 use chrono::{DateTime, Utc};
 use http::header::AUTHORIZATION;
-use pta::{
+use perthtransport::{
     constants::{PUBSUB_CHANNEL_WORKER_TASK_OUT, TRANSPERTH_REAL_TIME_API},
     types::{
         config::ApplicationConfig,

@@ -1,6 +1,6 @@
 use crate::task_manager::TaskManager;
 use futures_util::StreamExt;
-use pta::{
+use perthtransport::{
     constants::{PUBSUB_CHANNEL_OUT_PREFIX, PUBSUB_CHANNEL_WORKER_TASK_OUT},
     types::message::PubSubWorkerOutMessage,
 };

@@ -10,7 +10,7 @@ use futures_util::{
     stream::{SplitSink, SplitStream},
     SinkExt, StreamExt,
 };
-use pta::{
+use perthtransport::{
     constants::{PUBSUB_CHANNEL_GENERAL_IN, PUBSUB_CHANNEL_OUT_PREFIX},
     types::message::{PubSubAction, PubSubMessage, WebSocketMessage},
 };

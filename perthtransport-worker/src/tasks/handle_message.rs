@@ -1,7 +1,7 @@
 use super::handle_trip;
 use crate::task_manager::TaskManager;
 use anyhow::Context;
-use pta::types::{
+use perthtransport::types::{
     config::ApplicationConfig,
     message::{PubSubAction, PubSubMessage},
 };

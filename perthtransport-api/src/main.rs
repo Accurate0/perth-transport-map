@@ -28,8 +28,8 @@ mod types;
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
-    pta::log::init_logger();
-    let config = pta::config::get_application_config()?;
+    perthtransport::log::init_logger();
+    let config = perthtransport::config::get_application_config()?;
 
     let redis = redis::Client::open(config.redis_connection_string.clone())?;
     let state = AppState { redis };
