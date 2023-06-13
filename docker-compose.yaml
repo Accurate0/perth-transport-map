@@ -20,7 +20,7 @@ services:
 
   pta-worker:
     env_file:
-    - .env
+      - .env
     build:
       dockerfile: ./pta-worker/Dockerfile
       args:
