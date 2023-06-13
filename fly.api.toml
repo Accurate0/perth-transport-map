@@ -2,7 +2,7 @@ app = "perthtransport-api"
 primary_region = "syd"
 
 [build]
-image = "ghcr.io/Accurate0/perthtransport-api:latest"
+image = "ghcr.io/accurate0/perthtransport-api:main"
 # dockerfile = "./perthtransport-api/Dockerfile"
 
 [http_service]
