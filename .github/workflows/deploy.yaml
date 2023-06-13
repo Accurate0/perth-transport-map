@@ -36,8 +36,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: build & deploy
-        run: flyctl deploy --config ./fly.api.toml
+      - name: deploy
+        run: flyctl deploy --config ./fly.api.toml --wait-timeout 5m
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
@@ -47,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: build & deploy
+      - name: deploy
         run: flyctl deploy --config ./fly.worker.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
