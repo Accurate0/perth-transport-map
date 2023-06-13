@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: build & deploy
-        run: flyctl deploy --config ./fly.api.toml --local-only
+        run: flyctl deploy --config ./fly.api.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
@@ -48,6 +48,6 @@ jobs:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: build & deploy
-        run: flyctl deploy --config ./fly.worker.toml --local-only
+        run: flyctl deploy --config ./fly.worker.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
