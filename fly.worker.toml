@@ -2,7 +2,7 @@ app = "perthtransport-worker"
 primary_region = "syd"
 
 [build]
-image = "ghcr.io/Accurate0:perthtransport-worker"
+image = "ghcr.io/Accurate0:perthtransport-worker:main"
 # dockerfile = "./perthtransport-worker/Dockerfile"
 
 [env]
