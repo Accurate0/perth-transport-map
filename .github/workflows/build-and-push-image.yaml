@@ -30,7 +30,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/Accurate0/${{ inputs.image-name }}:latest
+          images: ${{ env.REGISTRY }}/Accurate0/${{ inputs.image-name }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
