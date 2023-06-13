@@ -38,7 +38,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: "{{defaultContext}}:${{ inputs.image-name }}"
+          context: .
+          file: ./${{ inputs.image-name }}/Dockerfile
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
