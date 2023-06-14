@@ -5,7 +5,7 @@ export const { getClient } = registerApolloClient(() => {
   return new ApolloClient({
     cache: new InMemoryCache(),
     link: new HttpLink({
-      uri: `${process.env.NEXT_PUBLIC_API_BASE}/graphql`,
+      uri: process.env.NEXT_PUBLIC_GRAPHQL_API_BASE,
       // you can disable result caching here if you want to
       // (this does not work if you are rendering your page with `export const dynamic = "force-static"`)
       // fetchOptions: { cache: "no-store" },

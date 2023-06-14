@@ -1,14 +1,27 @@
 "use client";
-import { GoogleMap, useLoadScript } from "@react-google-maps/api";
-import { useMemo } from "react";
+import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
+import { useEffect, useMemo, useState } from "react";
 import mapStyles from "./styles.json";
+import useWebSocket from "@/lib/useWebSocket";
 
 const Map = () => {
-  const libraries = useMemo(() => ["places"], []);
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
-    libraries: libraries as any,
   });
+
+  const [trainState, setTrainState] = useState<{ lat: number; lng: number }>();
+
+  const onMessage = (data: string) => {
+    setTrainState({
+      lat: parseFloat(JSON.parse(data)["currentPosition"]["latitude"]),
+      lng: parseFloat(JSON.parse(data)["currentPosition"]["longitude"]),
+    });
+  };
+
+  useEffect(() => console.log(trainState), [trainState]);
+
+  useWebSocket(onMessage);
+
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({
       disableDefaultUI: true,
@@ -17,10 +30,12 @@ const Map = () => {
     }),
     []
   );
+
   const mapCenter = useMemo(
     () => ({ lat: -31.957250462794217, lng: 115.86367878837541 }),
     []
   );
+
   const zoomLevel = 11;
 
   if (!isLoaded) {
@@ -34,7 +49,9 @@ const Map = () => {
       center={mapCenter}
       mapTypeId={google.maps.MapTypeId.ROADMAP}
       mapContainerStyle={{ width: "100%", height: "100%" }}
-    />
+    >
+      {trainState && <Marker position={{ ...trainState }} />}
+    </GoogleMap>
   );
 };
 
