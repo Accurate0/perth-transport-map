@@ -52,7 +52,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: perthtransport-web
-          path: perthtransport-web/.vercel/output
+          path: ./.vercel/output
 
   deploy-api:
     needs:
