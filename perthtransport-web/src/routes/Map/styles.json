@@ -48,6 +48,15 @@
     ]
   },
   {
+    "featureType": "landscape",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
     "featureType": "landscape.man_made",
     "elementType": "geometry",
     "stylers": [
