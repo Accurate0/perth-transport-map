@@ -11,7 +11,7 @@ env:
 
 jobs:
   build-and-push-image:
-    name: build & push ${{ inputs.image-name }}
+    name: ${{ inputs.image-name }}
     runs-on: ubuntu-latest
 
     steps:
