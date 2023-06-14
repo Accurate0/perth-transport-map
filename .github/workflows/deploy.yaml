@@ -12,7 +12,7 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  build-perthtransport-api:
+  build-api:
     uses: ./.github/workflows/build-and-push-image.yaml
     permissions:
       contents: read
@@ -21,7 +21,7 @@ jobs:
       image-name: perthtransport-api
     secrets: inherit
 
-  build-perthtransport-worker:
+  build-worker:
     uses: ./.github/workflows/build-and-push-image.yaml
     permissions:
       contents: read
@@ -30,10 +30,35 @@ jobs:
       image-name: perthtransport-worker
     secrets: inherit
 
-  deploy-perthtransport-api:
+  build-web:
+    defaults:
+      run:
+        working-directory: perthtransport-web
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: perthtransport-web
+          path: ./.vercel/output
+
+  deploy-api:
     needs:
-      - build-perthtransport-api
-      - build-perthtransport-worker
+      - build-api
+      - build-worker
+      - build-web
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -43,10 +68,11 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-  deploy-perthtransport-worker:
+  deploy-worker:
     needs:
-      - build-perthtransport-api
-      - build-perthtransport-worker
+      - build-api
+      - build-worker
+      - build-web
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -55,3 +81,19 @@ jobs:
         run: flyctl deploy --config ./fly.worker.toml
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  deploy-web:
+    needs:
+      - build-api
+      - build-worker
+      - build-web
+    runs-on: ubuntu-latest
+    steps:
+      - name: download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: perthtransport-web
+          path: ./.vercel/output
+
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
