@@ -2,13 +2,12 @@ import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useEffect, useMemo, useState } from "react";
 import mapStyles from "./styles.json";
 import useWebSocket from "../../hooks/useWebSocket";
+import SelectionInput from "../../components/SelectionInput";
 
 const MapRoute = () => {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_MAPS_API_KEY as string,
   });
-
-  const [trainState, setTrainState] = useState<{ lat: number; lng: number }>();
 
   const onMessage = (data: string) => {
     setTrainState({
@@ -17,9 +16,11 @@ const MapRoute = () => {
     });
   };
 
-  useEffect(() => console.log(trainState), [trainState]);
-
   useWebSocket(onMessage);
+
+  const [trainState, setTrainState] = useState<{ lat: number; lng: number }>();
+
+  useEffect(() => console.log(trainState), [trainState]);
 
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({
@@ -42,15 +43,18 @@ const MapRoute = () => {
   }
 
   return (
-    <GoogleMap
-      options={mapOptions}
-      zoom={zoomLevel}
-      center={mapCenter}
-      mapTypeId={google.maps.MapTypeId.ROADMAP}
-      mapContainerStyle={{ width: "100%", height: "100%" }}
-    >
-      {trainState && <Marker position={{ ...trainState }} />}
-    </GoogleMap>
+    <>
+      <SelectionInput />
+      <GoogleMap
+        options={mapOptions}
+        zoom={zoomLevel}
+        center={mapCenter}
+        mapTypeId={google.maps.MapTypeId.ROADMAP}
+        mapContainerStyle={{ width: "100%", height: "100%" }}
+      >
+        {trainState && <Marker position={{ ...trainState }} />}
+      </GoogleMap>
+    </>
   );
 };
 

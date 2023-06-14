@@ -15,7 +15,7 @@ use reqwest_tracing::TracingMiddleware;
 use std::{net::SocketAddr, sync::Arc};
 use tower::limit::GlobalConcurrencyLimitLayer;
 use tower_http::{
-    cors::{AllowOrigin, CorsLayer},
+    cors::{AllowHeaders, AllowOrigin, CorsLayer},
     trace::{DefaultOnRequest, DefaultOnResponse, TraceLayer},
     LatencyUnit,
 };
@@ -67,10 +67,11 @@ async fn main() -> Result<(), anyhow::Error> {
         .layer(
             CorsLayer::new()
                 .allow_origin(AllowOrigin::list([
-                    "http://localhost:3000".parse()?,
+                    "http://localhost:5173".parse()?,
                     "https://perthtransport.xyz".parse()?,
                 ]))
-                .allow_methods([Method::GET, Method::POST]),
+                .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
+                .allow_headers(AllowHeaders::any()),
         )
         .layer(Extension(schema))
         .layer(
