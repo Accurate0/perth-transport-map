@@ -1,22 +1,12 @@
-import { getClient } from "@/lib/apollo-client";
-import { gql } from "@apollo/client";
+import useRouteQuery from "@/queries/useRouteQuery";
+import Map from "@/components/Map";
 
-export default async function Home() {
-  const { data } = await getClient().query({
-    query: gql`
-      {
-        route(searchTerm: "arma") {
-          routes {
-            identifier
-            timetableId
-          }
-        }
-        liveTrips(timetableId: "PerthRestricted:RTG_10") {
-          liveTrips
-        }
-      }
-    `,
-  });
+export default async function Page() {
+  // const { data } = await useRouteQuery("arma");
 
-  return <></>;
+  return (
+    <>
+      <Map />
+    </>
+  );
 }
