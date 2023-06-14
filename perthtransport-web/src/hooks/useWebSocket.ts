@@ -7,7 +7,7 @@ const useWebSocket = (onMessage: (data: string) => void) => {
     websocket.onopen = () => {
       websocket.send(
         JSON.stringify({
-          tripId: "PerthRestricted:3458747",
+          tripId: "PerthRestricted:3458871",
         })
       );
     };

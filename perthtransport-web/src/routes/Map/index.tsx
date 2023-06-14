@@ -1,10 +1,9 @@
-"use client";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useEffect, useMemo, useState } from "react";
 import mapStyles from "./styles.json";
 import useWebSocket from "../../hooks/useWebSocket";
 
-const Map = () => {
+const MapRoute = () => {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_MAPS_API_KEY as string,
   });
@@ -55,4 +54,4 @@ const Map = () => {
   );
 };
 
-export default Map;
+export default MapRoute;
