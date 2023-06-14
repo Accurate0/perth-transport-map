@@ -2,3 +2,6 @@
 README.md
 fly.api.toml
 fly.worker.toml
+perthtransport-web/node_modules
+perthtransport-web/.next
+perthtransport-web/.vercel
