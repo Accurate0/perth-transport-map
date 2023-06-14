@@ -52,7 +52,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: perthtransport-web
-          path: ./.vercel/output
+          path: ./perthtransport-web/.vercel/output
+          if-no-files-found: "error"
 
   deploy-api:
     needs:
