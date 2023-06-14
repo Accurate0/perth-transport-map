@@ -1,6 +1,16 @@
 [
   {
+    "featureType": "all",
     "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "all",
+    "elementType": "labels.icon",
     "stylers": [
       {
         "visibility": "off"
@@ -44,7 +54,7 @@
     "featureType": "transit",
     "stylers": [
       {
-        "visibility": "off"
+        "visibility": "on"
       }
     ]
   },
@@ -109,62 +119,11 @@
     ]
   },
   {
-    "featureType": "road.highway",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#ffffff"
-      },
-      {
-        "visibility": "simplified"
-      }
-    ]
-  },
-  {
-    "featureType": "road.arterial",
-    "stylers": [
-      {
-        "visibility": "simplified"
-      },
-      {
-        "color": "#ffffff"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "labels.icon",
-    "stylers": [
-      {
-        "color": "#ffffff"
-      },
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "labels.icon",
+    "featureType": "road",
+    "elementType": "labels",
     "stylers": [
       {
         "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "road.arterial",
-    "stylers": [
-      {
-        "color": "#ffffff"
-      }
-    ]
-  },
-  {
-    "featureType": "road.local",
-    "stylers": [
-      {
-        "color": "#ffffff"
       }
     ]
   },
@@ -263,15 +222,6 @@
     ]
   },
   {
-    "featureType": "road.local",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "visibility": "on"
-      }
-    ]
-  },
-  {
     "featureType": "poi.government",
     "elementType": "geometry",
     "stylers": [
@@ -298,30 +248,11 @@
     ]
   },
   {
-    "featureType": "road.arterial",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "visibility": "simplified"
-      }
-    ]
-  },
-  {
     "featureType": "road.local",
     "stylers": [
       {
         "visibility": "simplified"
       }
     ]
-  },
-  {
-    "featureType": "road"
-  },
-  {
-    "featureType": "road"
-  },
-  {},
-  {
-    "featureType": "road.highway"
   }
 ]

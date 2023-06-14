@@ -2,11 +2,11 @@
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useEffect, useMemo, useState } from "react";
 import mapStyles from "./styles.json";
-import useWebSocket from "@/lib/useWebSocket";
+import useWebSocket from "../../hooks/useWebSocket";
 
 const Map = () => {
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
+    googleMapsApiKey: import.meta.env.VITE_MAPS_API_KEY as string,
   });
 
   const [trainState, setTrainState] = useState<{ lat: number; lng: number }>();
