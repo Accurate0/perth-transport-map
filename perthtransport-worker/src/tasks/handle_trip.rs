@@ -59,7 +59,11 @@ pub async fn handle_trip(
         let pta_realtime = response.json::<PTARealTimeResponse>().await?;
         let pta_realtime_converted = RealTimeResponse::try_from(pta_realtime)?;
         if let Some(first_stop) = pta_realtime_converted.transit_stops.first() {
-            if first_stop.real_time_info.trip_status == TransitStopStatus::Scheduled {
+            if first_stop
+                .real_time_info
+                .as_ref()
+                .is_some_and(|x| x.trip_status == TransitStopStatus::Scheduled)
+            {
                 tracing::warn!("this trip is scheduled for first station, no point tracking");
                 break Ok(());
             }

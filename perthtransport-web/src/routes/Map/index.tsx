@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import mapStyles from "./styles.json";
 import useWebSocket from "../../hooks/useWebSocket";
 import { faSubway } from "@fortawesome/free-solid-svg-icons";
+import { RouteName, getRouteColour } from "../../utils/getRouteColour";
 
 const MapRoute = () => {
   const { isLoaded } = useLoadScript({
@@ -70,7 +71,7 @@ const MapRoute = () => {
             position={{ ...t }}
             icon={{
               path: faSubway.icon[4] as string,
-              fillColor: "#01963a",
+              fillColor: getRouteColour(t.routeName as RouteName),
               fillOpacity: 1,
               anchor: new google.maps.Point(
                 faSubway.icon[0] / 2, // width

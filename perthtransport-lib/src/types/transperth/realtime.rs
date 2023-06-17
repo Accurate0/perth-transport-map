@@ -133,7 +133,7 @@ pub struct PTATripStop {
     #[serde(rename = "CanAlight")]
     pub can_alight: bool,
     #[serde(rename = "RealTimeInfo")]
-    pub real_time_info: PTARealTimeInfo2,
+    pub real_time_info: Option<PTATripStopRealTimeInfo>,
     #[serde(rename = "IsTimingPoint")]
     pub is_timing_point: Option<bool>,
     #[serde(rename = "ArrivalTime")]
@@ -167,7 +167,7 @@ pub struct PTATransitStop {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PTARealTimeInfo2 {
+pub struct PTATripStopRealTimeInfo {
     #[serde(rename = "RealTimeTripStatus")]
     pub real_time_trip_status: i64,
     #[serde(rename = "EstimatedDepartureTime")]

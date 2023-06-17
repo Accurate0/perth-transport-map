@@ -25,7 +25,7 @@ pub struct GeoPosition {
 pub struct TransitStop {
     pub position: GeoPosition,
     pub description: String,
-    pub real_time_info: RealTimeInfo,
+    pub real_time_info: Option<RealTimeInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

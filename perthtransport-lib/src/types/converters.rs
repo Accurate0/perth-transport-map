@@ -22,11 +22,11 @@ impl TryFrom<PTARealTimeResponse> for RealTimeResponse {
                 Ok(TransitStop {
                     position: GeoPosition::try_from_str(&t.transit_stop.position)?,
                     description: t.transit_stop.description.clone(),
-                    real_time_info: RealTimeInfo {
-                        trip_status: t.real_time_info.real_time_trip_status.into(),
-                        estimated_arrival_time: t.real_time_info.estimated_arrival_time.clone(),
-                        estimated_departure_time: t.real_time_info.estimated_departure_time.clone(),
-                    },
+                    real_time_info: t.real_time_info.as_ref().map(|rti| RealTimeInfo {
+                        trip_status: rti.real_time_trip_status.into(),
+                        estimated_arrival_time: rti.estimated_arrival_time.clone(),
+                        estimated_departure_time: rti.estimated_departure_time.clone(),
+                    }),
                 })
             })
             .collect::<Vec<_>>();
