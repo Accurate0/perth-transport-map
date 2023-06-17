@@ -1,25 +1,25 @@
 use crate::auth::generate_realtime_auth_header;
 use chrono::{DateTime, Utc};
+use flume::Sender;
 use http::header::AUTHORIZATION;
 use perthtransport::{
-    constants::{PUBSUB_CHANNEL_WORKER_TASK_OUT, TRANSPERTH_REAL_TIME_API},
+    constants::TRANSPERTH_REAL_TIME_API,
     types::{
         config::ApplicationConfig,
-        message::PubSubWorkerOutMessage,
-        response::realtime::RealTimeResponse,
+        message::WorkerMessage,
+        response::realtime::{RealTimeResponse, TransitStopStatus},
         transperth::realtime::{PTARealTimeRequest, PTARealTimeResponse},
     },
 };
-use redis::{aio::MultiplexedConnection, AsyncCommands};
 use std::{
     sync::Arc,
     time::{Duration, SystemTime},
 };
-use tokio::{sync::RwLock, time::Instant};
+use tokio::time::Instant;
 
 pub async fn handle_trip(
     http_client: Arc<reqwest_middleware::ClientWithMiddleware>,
-    redis: Arc<RwLock<MultiplexedConnection>>,
+    worker_tx: Sender<WorkerMessage>,
     config: Arc<ApplicationConfig>,
     trip_id: String,
 ) -> Result<(), anyhow::Error> {
@@ -58,18 +58,19 @@ pub async fn handle_trip(
 
         let pta_realtime = response.json::<PTARealTimeResponse>().await?;
         let pta_realtime_converted = RealTimeResponse::try_from(pta_realtime)?;
-        {
-            let mut redis = redis.write().await;
-            redis
-                .publish(
-                    PUBSUB_CHANNEL_WORKER_TASK_OUT,
-                    serde_json::to_string(&PubSubWorkerOutMessage {
-                        response: pta_realtime_converted,
-                        trip_id: trip_id.clone(),
-                    })?,
-                )
-                .await?;
+        if let Some(first_stop) = pta_realtime_converted.transit_stops.first() {
+            if first_stop.real_time_info.trip_status == TransitStopStatus::Scheduled {
+                tracing::warn!("this trip is scheduled for first station, no point tracking");
+                break Ok(());
+            }
         }
+
+        worker_tx
+            .send_async(WorkerMessage {
+                response: pta_realtime_converted,
+                trip_id: trip_id.clone(),
+            })
+            .await?;
 
         tracing::info!("task sleeping");
         tokio::time::sleep(Duration::from_secs(30)).await;

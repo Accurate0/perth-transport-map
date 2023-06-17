@@ -1,10 +1,10 @@
-use anyhow::Context;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct RealTimeResponse {
     pub trip_id: String,
+    pub route_name: String,
     pub current_position: GeoPosition,
     // TODO: datetime
     pub last_updated: String,
@@ -16,31 +16,8 @@ pub struct RealTimeResponse {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GeoPosition {
-    pub latitude: String,
-    pub longitude: String,
-}
-
-impl GeoPosition {
-    pub fn try_from_str(value: &str) -> Result<Self, anyhow::Error> {
-        let mut s = if value.contains(',') {
-            value.split(", ")
-        } else {
-            // compatible types..
-            #[allow(clippy::single_char_pattern)]
-            value.split(" ")
-        };
-
-        Ok(Self {
-            latitude: s
-                .next()
-                .context(format!("geoposition invalid: {}", value))?
-                .to_owned(),
-            longitude: s
-                .next()
-                .context(format!("geoposition invalid: {}", value))?
-                .to_owned(),
-        })
-    }
+    pub latitude: f64,
+    pub longitude: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -54,9 +31,15 @@ pub struct TransitStop {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct RealTimeInfo {
-    // TODO: this is an enum in reality
-    pub trip_status: i64,
+    pub trip_status: TransitStopStatus,
     // TODO: datetime
     pub estimated_arrival_time: Option<String>,
     pub estimated_departure_time: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub enum TransitStopStatus {
+    Completed,
+    AtStation,
+    Scheduled,
 }

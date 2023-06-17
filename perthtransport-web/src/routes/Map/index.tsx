@@ -1,8 +1,8 @@
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import mapStyles from "./styles.json";
 import useWebSocket from "../../hooks/useWebSocket";
-import SelectionInput from "../../components/SelectionInput";
+import { faSubway, faTrain } from "@fortawesome/free-solid-svg-icons";
 
 const MapRoute = () => {
   const { isLoaded } = useLoadScript({
@@ -10,17 +10,30 @@ const MapRoute = () => {
   });
 
   const onMessage = (data: string) => {
-    setTrainState({
-      lat: parseFloat(JSON.parse(data)["currentPosition"]["latitude"]),
-      lng: parseFloat(JSON.parse(data)["currentPosition"]["longitude"]),
-    });
+    const jsonData = JSON.parse(data);
+
+    setTrainState((prev) => [
+      ...prev.filter((x) => x.tripId !== jsonData["tripId"]),
+      {
+        // TODO: types :)
+        lat: jsonData["currentPosition"]["latitude"],
+        lng: jsonData["currentPosition"]["longitude"],
+        tripId: jsonData["tripId"],
+        routeName: jsonData["routeName"],
+      },
+    ]);
   };
 
   useWebSocket(onMessage);
 
-  const [trainState, setTrainState] = useState<{ lat: number; lng: number }>();
-
-  useEffect(() => console.log(trainState), [trainState]);
+  const [trainState, setTrainState] = useState<
+    {
+      lat: number;
+      lng: number;
+      tripId: string;
+      routeName: string;
+    }[]
+  >([]);
 
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({
@@ -44,7 +57,6 @@ const MapRoute = () => {
 
   return (
     <>
-      <SelectionInput />
       <GoogleMap
         options={mapOptions}
         zoom={zoomLevel}
@@ -52,7 +64,24 @@ const MapRoute = () => {
         mapTypeId={google.maps.MapTypeId.ROADMAP}
         mapContainerStyle={{ width: "100%", height: "100%" }}
       >
-        {trainState && <Marker position={{ ...trainState }} />}
+        {trainState.map((t) => (
+          <Marker
+            key={t.tripId}
+            position={{ ...t }}
+            icon={{
+              path: faSubway.icon[4] as string,
+              fillColor: "#01963a",
+              fillOpacity: 1,
+              anchor: new google.maps.Point(
+                faSubway.icon[0] / 2, // width
+                faSubway.icon[1] // height
+              ),
+              strokeWeight: 1,
+              strokeColor: "#ffffff",
+              scale: 0.055,
+            }}
+          />
+        ))}
       </GoogleMap>
     </>
   );

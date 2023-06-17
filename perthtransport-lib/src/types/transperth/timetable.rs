@@ -9,20 +9,20 @@ pub struct PTATimetableResponse {
     #[serde(rename = "Status")]
     pub status: PTAStatus,
     #[serde(rename = "StartDate")]
-    pub start_date: String,
+    pub start_date: Option<String>,
     #[serde(rename = "EndDate")]
-    pub end_date: String,
-    #[serde(rename = "TimetableTrips")]
+    pub end_date: Option<String>,
+    #[serde(rename = "TimetableTrips", default)]
     pub timetable_trips: Vec<PTATimetableTrip>,
-    #[serde(rename = "StopPatterns")]
+    #[serde(rename = "StopPatterns", default)]
     pub stop_patterns: Vec<PTAStopPattern>,
-    #[serde(rename = "Routes")]
+    #[serde(rename = "Routes", default)]
     pub routes: Vec<PTARoute>,
-    #[serde(rename = "TransitStops")]
+    #[serde(rename = "TransitStops", default)]
     pub transit_stops: Vec<PTATransitStop>,
-    #[serde(rename = "RunningDatePatterns")]
+    #[serde(rename = "RunningDatePatterns", default)]
     pub running_date_patterns: Vec<PTARunningDatePattern>,
-    #[serde(rename = "Notes")]
+    #[serde(rename = "Notes", default)]
     pub notes: Vec<PTANote>,
 }
 

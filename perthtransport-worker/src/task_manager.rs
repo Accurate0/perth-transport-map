@@ -78,7 +78,7 @@ impl TaskManager {
         socket_id: String,
         task_id: String,
         start_task: impl Fn() -> JoinHandle<()>,
-    ) -> Result<(), anyhow::Error> {
+    ) -> Result<bool, anyhow::Error> {
         let mut websocket_subscriptions = self.websocket_subscriptions.write().await;
         websocket_subscriptions
             .entry(socket_id.clone())
@@ -97,12 +97,14 @@ impl TaskManager {
         if self.task_exists(&task_id).await? {
             // Do nothing
             tracing::info!("[{}] task already exists", task_id);
+
+            Ok(false)
         } else {
             let mut existing_tasks = self.existing_tasks.write().await;
             existing_tasks.insert(task_id, start_task());
-        }
 
-        Ok(())
+            Ok(true)
+        }
     }
 
     pub async fn get_all_task_subscribers(&self, task_id: String) -> Option<HashSet<String>> {

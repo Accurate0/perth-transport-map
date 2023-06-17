@@ -1,6 +1,7 @@
 pub const CONFIG_PREFIX: &str = "PTA";
 pub const PUBSUB_CHANNEL_GENERAL_IN: &str = "pta_in";
 pub const PUBSUB_CHANNEL_OUT_PREFIX: &str = "pta_out";
+pub const CACHE_KEY_PREFIX: &str = "pta_trip";
 pub const PUBSUB_CHANNEL_WORKER_TASK_OUT: &str = "pta_worker_out";
 pub const PUBSUB_CHANNEL_WORKER_HEALTH_IN: &str = "pta_worker_health_in";
 pub const PUBSUB_CHANNEL_WORKER_HEALTH_OUT: &str = "pta_worker_health_out";

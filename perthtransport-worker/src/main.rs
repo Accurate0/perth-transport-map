@@ -1,14 +1,16 @@
+use crate::tasks::handle_healthcheck;
 use futures_util::StreamExt;
-use http::header::{ACCEPT_ENCODING, CONTENT_TYPE, HOST, USER_AGENT};
-use perthtransport::constants::{PUBSUB_CHANNEL_GENERAL_IN, PUBSUB_CHANNEL_WORKER_HEALTH_IN};
+use http::header::{ACCEPT, ACCEPT_ENCODING, CONTENT_TYPE, HOST, USER_AGENT};
+use perthtransport::{
+    constants::{PUBSUB_CHANNEL_GENERAL_IN, PUBSUB_CHANNEL_WORKER_HEALTH_IN},
+    types::message::WorkerMessage,
+};
 use reqwest::header::HeaderMap;
 use reqwest_tracing::TracingMiddleware;
 use std::sync::Arc;
 use task_manager::TaskManager;
 use tokio::sync::RwLock;
 use tracing::{Instrument, Level};
-
-use crate::tasks::handle_healthcheck;
 
 mod auth;
 mod task_manager;
@@ -30,6 +32,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let mut default_headers = HeaderMap::new();
     default_headers.append(ACCEPT_ENCODING, "gzip".parse()?);
     default_headers.append(CONTENT_TYPE, "application/json".parse()?);
+    default_headers.append(ACCEPT, "application/json".parse()?);
     default_headers.append(HOST, "realtime.transperth.info".parse()?);
     default_headers.append(USER_AGENT, "okhttp/4.9.2".parse()?);
 
@@ -46,19 +49,17 @@ async fn main() -> Result<(), anyhow::Error> {
     let task_manager = Arc::new(TaskManager::new());
 
     let worker_redis_connection = redis.get_multiplexed_async_connection().await?;
-    let worker_pubsub_connection = redis.get_async_connection().await?;
     let worker_task_manager = Arc::clone(&task_manager);
 
     tracing::info!("starting worker");
     let span = tracing::span!(Level::INFO, "trip_out");
+    let (worker_tx, worker_rx) = flume::unbounded::<WorkerMessage>();
+
     let worker_out_handle = Arc::new(tokio::spawn(async move {
-        if let Err(e) = tasks::handle_worker_out(
-            worker_redis_connection,
-            worker_pubsub_connection,
-            worker_task_manager,
-        )
-        .instrument(span)
-        .await
+        if let Err(e) =
+            tasks::handle_worker_out(worker_redis_connection, worker_rx, worker_task_manager)
+                .instrument(span)
+                .await
         {
             tracing::error!("error handling worker out task: {}", e)
         }
@@ -69,6 +70,7 @@ async fn main() -> Result<(), anyhow::Error> {
         let redis_multiplexed = Arc::clone(&redis_multiplexed);
         let task_manager = Arc::clone(&task_manager);
         let worker_out_handle = Arc::clone(&worker_out_handle);
+        let worker_tx = worker_tx.clone();
         let config = Arc::clone(&config);
         let message = redis_pubsub.on_message().next().await;
 
@@ -85,6 +87,7 @@ async fn main() -> Result<(), anyhow::Error> {
                 tokio::spawn(async {
                     if let Err(e) = tasks::handle_message(
                         http_client,
+                        worker_tx,
                         redis_multiplexed,
                         task_manager,
                         message,

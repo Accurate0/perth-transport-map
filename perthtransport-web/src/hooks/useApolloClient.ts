@@ -5,7 +5,6 @@ const useApolloClient = () => {
   return useMemo(() => {
     return new ApolloClient({
       uri: import.meta.env.VITE_GRAPHQL_API_BASE,
-
       cache: new InMemoryCache(),
     });
   }, []);
