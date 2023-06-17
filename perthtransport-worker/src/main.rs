@@ -65,11 +65,23 @@ async fn main() -> Result<(), anyhow::Error> {
         }
     }));
 
+    let background_task_manager = Arc::clone(&task_manager);
+    let span = tracing::span!(Level::INFO, "task_manager");
+    let task_manager_out_handle = Arc::new(tokio::spawn(async move {
+        if let Err(e) = tasks::handle_task_manager(background_task_manager)
+            .instrument(span)
+            .await
+        {
+            tracing::error!("error handling worker out task: {}", e)
+        }
+    }));
+
     loop {
         let http_client = Arc::clone(&http_client);
         let redis_multiplexed = Arc::clone(&redis_multiplexed);
         let task_manager = Arc::clone(&task_manager);
         let worker_out_handle = Arc::clone(&worker_out_handle);
+        let task_manager_out_handle = Arc::clone(&task_manager_out_handle);
         let worker_tx = worker_tx.clone();
         let config = Arc::clone(&config);
         let message = redis_pubsub.on_message().next().await;
@@ -80,8 +92,13 @@ async fn main() -> Result<(), anyhow::Error> {
             let span = tracing::info_span!("health_check");
             if channel_name == PUBSUB_CHANNEL_WORKER_HEALTH_IN {
                 tokio::spawn(
-                    handle_healthcheck(worker_out_handle, redis_multiplexed, task_manager)
-                        .instrument(span),
+                    handle_healthcheck(
+                        worker_out_handle,
+                        task_manager_out_handle,
+                        redis_multiplexed,
+                        task_manager,
+                    )
+                    .instrument(span),
                 );
             } else {
                 tokio::spawn(async {

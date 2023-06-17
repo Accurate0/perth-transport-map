@@ -12,6 +12,8 @@ use reqwest_middleware::ClientWithMiddleware;
 use std::{sync::Arc, time::SystemTime};
 use tokio::time::Instant;
 
+// TODO: cache this query
+// using cached package probs, i'm lazy
 pub async fn get_live_trips_for(
     timetable_id: &str,
     config: &ApplicationConfig,

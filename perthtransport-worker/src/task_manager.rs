@@ -118,4 +118,34 @@ impl TaskManager {
         // TODO: determine what is health for this
         true
     }
+
+    pub async fn ensure_all_tasks_runnings(&self) -> Result<(), anyhow::Error> {
+        tracing::info!("checking status of all known tasks");
+        let mut dead_tasks = vec![];
+
+        let existing_tasks = self.existing_tasks.read().await;
+        for (key, value) in existing_tasks.iter() {
+            let running = !value.is_finished();
+            if !running {
+                dead_tasks.push(key.clone());
+            }
+        }
+
+        tracing::info!(
+            "total tasks: {}, dead tasks: {}",
+            existing_tasks.keys().len(),
+            dead_tasks.len()
+        );
+
+        // explicit unlock... remember what happened last time...
+        std::mem::drop(existing_tasks);
+
+        let mut existing_tasks = self.existing_tasks.write().await;
+        for dead_task in dead_tasks {
+            existing_tasks.remove(&dead_task);
+        }
+
+        tracing::info!("removed all dead tasks");
+        Ok(())
+    }
 }
