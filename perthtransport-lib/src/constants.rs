@@ -9,3 +9,4 @@ pub const TRANSPERTH_REAL_TIME_API: &str = "https://realtime.transperth.info/SJP
 pub const TRANSPERTH_ROUTE_ENDPOINT: &str = "https://au-journeyplanner.silverrail.io/journeyplannerservice/v2/REST/DataSets/PerthRestricted/Routes";
 pub const TRANSPERTH_TIMETABLE_ENDPOINT: &str = "https://au-journeyplanner.silverrail.io/journeyplannerservice/v2/REST/DataSets/PerthRestricted/Timetable";
 pub const TRANSPERTH_TRIP_LOOKUP: &str = "https://serviceinformation.transperth.info/api/TripInfo";
+pub const TRANSPERTH_EARLY_HOURS: [u32; 5] = [0, 1, 2, 3, 4];

@@ -11,6 +11,7 @@ services:
     container_name: perthtransport-api
     environment:
       - PTA_REDIS_CONNECTION_STRING=redis://redis-connection
+      - RUST_LOG
     depends_on:
       - redis
     links:
@@ -29,6 +30,7 @@ services:
     container_name: perthtransport-worker
     environment:
       - PTA_REDIS_CONNECTION_STRING=redis://redis-connection
+      - RUST_LOG
     depends_on:
       - redis
     links:

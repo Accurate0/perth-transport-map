@@ -1,9 +1,10 @@
 use crate::auth::generate_realtime_auth_header;
-use chrono::{DateTime, Utc};
+use anyhow::Context;
+use chrono::{DateTime, Days, Timelike, Utc};
 use flume::Sender;
 use http::header::AUTHORIZATION;
 use perthtransport::{
-    constants::TRANSPERTH_REAL_TIME_API,
+    constants::{TRANSPERTH_EARLY_HOURS, TRANSPERTH_REAL_TIME_API},
     types::{
         config::ApplicationConfig,
         message::WorkerMessage,
@@ -56,7 +57,47 @@ pub async fn handle_trip(
             start.elapsed().as_millis()
         );
 
-        let pta_realtime = response.json::<PTARealTimeResponse>().await?;
+        let pta_realtime = response.json::<PTARealTimeResponse>().await;
+
+        // something at happens at around midnight only
+        let pta_realtime = if pta_realtime
+            .as_ref()
+            .is_err_and(|_| TRANSPERTH_EARLY_HOURS.contains(&now_in_perth.hour()))
+        {
+            let now_in_perth = now.with_timezone(&chrono_tz::Australia::Perth);
+            let datetime = now_in_perth
+                .checked_sub_days(Days::new(1))
+                .context("unable to sub 1 day")?
+                .format("%Y-%m-%d")
+                .to_string();
+
+            let response = http_client
+                .post(TRANSPERTH_REAL_TIME_API)
+                .json(&PTARealTimeRequest {
+                    trip_uid: trip_id.clone(),
+                    trip_date: datetime,
+                    is_mapping_data_returned: true,
+                    is_real_time_checked: true,
+                    return_notes: true,
+                })
+                .header(
+                    AUTHORIZATION,
+                    generate_realtime_auth_header(&config.realtime_api_key).await?,
+                )
+                .send()
+                .await?;
+
+            tracing::info!(
+                "realtime request completed with status: {} in {} ms",
+                response.status(),
+                start.elapsed().as_millis()
+            );
+
+            response.json::<PTARealTimeResponse>().await
+        } else {
+            pta_realtime
+        }?;
+
         let pta_realtime_converted = RealTimeResponse::try_from(pta_realtime)?;
         if let Some(first_stop) = pta_realtime_converted.transit_stops.first() {
             if first_stop

@@ -1,12 +1,13 @@
 use crate::{
-    constants::{TRANSPERTH_TIMETABLE_ENDPOINT, TRANSPERTH_TRIP_LOOKUP},
+    constants::{TRANSPERTH_EARLY_HOURS, TRANSPERTH_TIMETABLE_ENDPOINT, TRANSPERTH_TRIP_LOOKUP},
     types::{
         config::ApplicationConfig,
         response::trip::LiveTripResponse,
         transperth::{timetable::PTATimetableResponse, trip::PTATripResponse},
     },
 };
-use chrono::{DateTime, Utc};
+use anyhow::Context;
+use chrono::{DateTime, Days, Timelike, Utc};
 use http::header::HOST;
 use reqwest_middleware::ClientWithMiddleware;
 use std::{sync::Arc, time::SystemTime};
@@ -52,11 +53,50 @@ pub async fn get_live_trips_for(
     );
 
     let timetable_response = response.json::<PTATimetableResponse>().await?;
-    let trip_ids: Vec<String> = timetable_response
+    let mut trip_ids: Vec<String> = timetable_response
         .timetable_trips
         .iter()
         .map(|t| t.trip_source_id.clone())
         .collect();
+
+    // this is something the app does at around midnight?
+    if TRANSPERTH_EARLY_HOURS.contains(&now_in_perth.hour()) {
+        let datetime = now_in_perth
+            .checked_sub_days(Days::new(1))
+            .context("could not sub 1 day")?
+            .format("%Y-%m-%d")
+            .to_string();
+
+        let response = http_client
+            .get(TRANSPERTH_TIMETABLE_ENDPOINT)
+            .header(HOST, "au-journeyplanner.silverrail.io".parse::<String>()?)
+            .query(&[
+                ("ApiKey", config.reference_data_api_key.as_str()),
+                ("format", "json"),
+                ("Route", timetable_id),
+                ("StartDate", &datetime),
+                ("EndDate", &datetime),
+                ("ReturnNotes", "true"),
+                ("_", &now.to_string()),
+            ])
+            .send()
+            .await?;
+
+        tracing::info!(
+            "timetable request completed with status: {} in {} ms",
+            response.status(),
+            start.elapsed().as_millis()
+        );
+
+        let timetable_response = response.json::<PTATimetableResponse>().await?;
+        trip_ids.append(
+            &mut timetable_response
+                .timetable_trips
+                .iter()
+                .map(|t| t.trip_source_id.clone())
+                .collect(),
+        );
+    }
 
     let start = Instant::now();
     let response = http_client
