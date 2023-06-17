@@ -119,7 +119,7 @@ impl TaskManager {
         true
     }
 
-    pub async fn ensure_all_tasks_runnings(&self) -> Result<(), anyhow::Error> {
+    pub async fn clean_up_dead_tasks(&self) -> Result<(), anyhow::Error> {
         tracing::info!("checking status of all known tasks");
         let mut dead_tasks = vec![];
 
