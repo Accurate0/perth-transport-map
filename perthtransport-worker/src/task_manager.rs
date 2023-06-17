@@ -6,11 +6,12 @@ use std::{
 use tokio::{sync::RwLock, task::JoinHandle};
 
 pub struct TaskManager {
-    // socket id -> list of trips subscribed
+    // socket id -> list of tasks subscribed
     websocket_subscriptions: Arc<RwLock<HashMap<String, HashSet<String>>>>,
     // trip -> list of subscribed sockets
     task_subscribers: Arc<RwLock<HashMap<String, HashSet<String>>>>,
-    // all trips running
+    // all tasks running
+    // TODO: check periodically to see if all handles still alive :)
     existing_tasks: Arc<RwLock<HashMap<String, JoinHandle<()>>>>,
 }
 
