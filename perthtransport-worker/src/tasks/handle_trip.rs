@@ -60,6 +60,7 @@ pub async fn handle_trip(
         let pta_realtime = response.json::<PTARealTimeResponse>().await;
 
         // something at happens at around midnight only
+        // TODO: refactor
         let pta_realtime = if pta_realtime
             .as_ref()
             .is_err_and(|_| TRANSPERTH_EARLY_HOURS.contains(&now_in_perth.hour()))

@@ -60,6 +60,7 @@ pub async fn get_live_trips_for(
         .collect();
 
     // this is something the app does at around midnight?
+    // TODO: refactor
     if TRANSPERTH_EARLY_HOURS.contains(&now_in_perth.hour()) {
         let datetime = now_in_perth
             .checked_sub_days(Days::new(1))
