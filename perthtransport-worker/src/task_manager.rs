@@ -137,6 +137,10 @@ impl TaskManager {
             dead_tasks.len()
         );
 
+        if dead_tasks.is_empty() {
+            return Ok(());
+        }
+
         // explicit unlock... remember what happened last time...
         std::mem::drop(existing_tasks);
 
