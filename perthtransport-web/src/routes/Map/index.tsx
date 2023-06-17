@@ -2,7 +2,7 @@ import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useMemo, useState } from "react";
 import mapStyles from "./styles.json";
 import useWebSocket from "../../hooks/useWebSocket";
-import { faSubway, faTrain } from "@fortawesome/free-solid-svg-icons";
+import { faSubway } from "@fortawesome/free-solid-svg-icons";
 
 const MapRoute = () => {
   const { isLoaded } = useLoadScript({
