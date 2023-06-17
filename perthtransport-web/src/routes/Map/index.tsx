@@ -1,11 +1,16 @@
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useMemo, useState } from "react";
-import mapStyles from "./styles.json";
+import lightStyles from "./styles.light.json";
+import darkStyles from "./styles.dark.json";
 import useWebSocket from "../../hooks/useWebSocket";
 import { faSubway } from "@fortawesome/free-solid-svg-icons";
 import { RouteName, getRouteColour } from "../../utils/getRouteColour";
+import DarkModeToggle from "../../components/DarkModeToggle";
+import useDarkMode from "../../hooks/useDarkMode";
 
 const MapRoute = () => {
+  const { isDarkMode } = useDarkMode();
+
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_MAPS_API_KEY as string,
   });
@@ -40,9 +45,11 @@ const MapRoute = () => {
     () => ({
       disableDefaultUI: true,
       clickableIcons: true,
-      styles: mapStyles as google.maps.MapTypeStyle[],
+      styles: (isDarkMode
+        ? darkStyles
+        : lightStyles) as google.maps.MapTypeStyle[],
     }),
-    []
+    [isDarkMode]
   );
 
   const mapCenter = useMemo(
@@ -58,12 +65,16 @@ const MapRoute = () => {
 
   return (
     <>
+      <DarkModeToggle />
       <GoogleMap
         options={mapOptions}
         zoom={zoomLevel}
         center={mapCenter}
         mapTypeId={google.maps.MapTypeId.ROADMAP}
-        mapContainerStyle={{ width: "100%", height: "100%" }}
+        mapContainerStyle={{
+          width: "100%",
+          height: "100%",
+        }}
       >
         {trainState.map((t) => (
           <Marker
@@ -77,8 +88,8 @@ const MapRoute = () => {
                 faSubway.icon[0] / 2, // width
                 faSubway.icon[1] // height
               ),
-              strokeWeight: 1,
-              strokeColor: "#ffffff",
+              // strokeWeight: isDarkMode ? 1 : 0,
+              // strokeColor: "#000000",
               scale: 0.055,
             }}
           />
