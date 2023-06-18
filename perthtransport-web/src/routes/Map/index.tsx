@@ -53,6 +53,14 @@ const MapRoute = () => {
       styles: (isDarkMode
         ? darkStyles
         : lightStyles) as google.maps.MapTypeStyle[],
+      restriction: {
+        latLngBounds: {
+          north: -31.64983458918886,
+          south: -32.56142128884333,
+          west: 114.8536535903477,
+          east: 116.59953695847219,
+        },
+      },
     }),
     [isDarkMode]
   );
@@ -94,8 +102,6 @@ const MapRoute = () => {
                 faSubway.icon[0] / 2, // width
                 faSubway.icon[1] // height
               ),
-              // strokeWeight: isDarkMode ? 1 : 0,
-              // strokeColor: "#000000",
               scale: 0.055,
             }}
           />
