@@ -1,4 +1,9 @@
-import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  MarkerF,
+  TransitLayerF,
+  useLoadScript,
+} from "@react-google-maps/api";
 import { useMemo, useState } from "react";
 import lightStyles from "./styles.light.json";
 import darkStyles from "./styles.dark.json";
@@ -76,8 +81,9 @@ const MapRoute = () => {
           height: "100%",
         }}
       >
+        <TransitLayerF />
         {trainState.map((t) => (
-          <Marker
+          <MarkerF
             key={t.tripId}
             position={{ ...t }}
             icon={{

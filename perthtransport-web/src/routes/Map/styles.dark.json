@@ -238,7 +238,7 @@
     "elementType": "geometry.fill",
     "stylers": [
       {
-        "color": "#e5c163"
+        "color": "#d9dedb"
       },
       {
         "lightness": "0"
@@ -295,13 +295,10 @@
   },
   {
     "featureType": "transit",
-    "elementType": "geometry",
+    "elementType": "geometry.stroke",
     "stylers": [
       {
-        "color": "#000000"
-      },
-      {
-        "lightness": 20
+        "visibility": "off"
       }
     ]
   },
