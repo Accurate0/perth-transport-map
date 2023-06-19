@@ -8,7 +8,7 @@ import { useMemo, useState } from "react";
 import lightStyles from "./styles.light.json";
 import darkStyles from "./styles.dark.json";
 import useWebSocket from "../../hooks/useWebSocket";
-import { faSquare } from "@fortawesome/free-solid-svg-icons";
+import { faSubway } from "@fortawesome/free-solid-svg-icons";
 import { RouteName, getRouteColour } from "../../utils/getRouteColour";
 import DarkModeToggle from "../../components/DarkModeToggle";
 import useDarkMode from "../../hooks/useDarkMode";
@@ -95,12 +95,12 @@ const MapRoute = () => {
             key={t.tripId}
             position={{ ...t }}
             icon={{
-              path: faSquare.icon[4] as string,
+              path: faSubway.icon[4] as string,
               fillColor: getRouteColour(t.routeName as RouteName),
               fillOpacity: 1,
               anchor: new google.maps.Point(
-                faSquare.icon[0] / 2, // width
-                faSquare.icon[1] // height
+                faSubway.icon[0] / 2, // width
+                faSubway.icon[1] // height
               ),
               scale: 0.035,
             }}
