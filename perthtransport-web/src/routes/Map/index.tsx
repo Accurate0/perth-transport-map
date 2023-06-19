@@ -8,13 +8,14 @@ import lightStyles from "./styles.light.json";
 import darkStyles from "./styles.dark.json";
 import useWebSocket from "../../hooks/useWebSocket";
 import { faSubway } from "@fortawesome/free-solid-svg-icons";
-import { RouteName, getRouteColour } from "../../utils/getRouteColour";
+import { RouteName, useGetRouteColour } from "../../utils/getRouteColour";
 import DarkModeToggle from "../../components/DarkModeToggle";
 import useDarkMode from "../../hooks/useDarkMode";
 import { AnimatedMarker } from "../../components/AnimatedMarker";
 
 const MapRoute = () => {
   const { isDarkMode } = useDarkMode();
+  const getRouteColour = useGetRouteColour();
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_MAPS_API_KEY as string,

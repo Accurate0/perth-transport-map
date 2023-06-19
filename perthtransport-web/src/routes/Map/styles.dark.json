@@ -238,10 +238,7 @@
     "elementType": "geometry.fill",
     "stylers": [
       {
-        "color": "#d9dedb"
-      },
-      {
-        "lightness": "0"
+        "color": "#5e5c64"
       }
     ]
   },
@@ -296,6 +293,22 @@
   {
     "featureType": "transit",
     "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station.airport",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station.bus",
     "stylers": [
       {
         "visibility": "off"
