@@ -12,7 +12,8 @@
 - [x] graphql api over reference data to lookup trip id from coordinates
 - [ ] handle deployments or other worker restarts
     - save to redis and restart tasks on startup?
-- [ ] check tasks that have died due to error and remove them
+- [x] check tasks that have died due to error and remove them
     - another background task?
     - or piggy back another call?
 - [ ] handle no real time info error?
+- [ ] refresh more often for some lines or all?
