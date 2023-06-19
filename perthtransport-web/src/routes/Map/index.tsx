@@ -91,7 +91,9 @@ const MapRoute = () => {
         }}
       >
         <TransitLayerF />
+
         {trainState.map((t) => (
+          // TODO: add on click information
           <AnimatedMarker
             key={t.tripId}
             position={new google.maps.LatLng({ ...t })}
