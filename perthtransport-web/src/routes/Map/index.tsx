@@ -1,6 +1,5 @@
 import {
   GoogleMap,
-  MarkerF,
   TransitLayerF,
   useLoadScript,
 } from "@react-google-maps/api";
@@ -12,6 +11,7 @@ import { faSubway } from "@fortawesome/free-solid-svg-icons";
 import { RouteName, getRouteColour } from "../../utils/getRouteColour";
 import DarkModeToggle from "../../components/DarkModeToggle";
 import useDarkMode from "../../hooks/useDarkMode";
+import { AnimatedMarker } from "../../components/AnimatedMarker";
 
 const MapRoute = () => {
   const { isDarkMode } = useDarkMode();
@@ -55,7 +55,7 @@ const MapRoute = () => {
         : lightStyles) as google.maps.MapTypeStyle[],
       restriction: {
         latLngBounds: {
-          north: -31.64983458918886,
+          north: -31.61983458918886,
           south: -32.56142128884333,
           west: 114.8536535903477,
           east: 116.59953695847219,
@@ -91,9 +91,9 @@ const MapRoute = () => {
       >
         <TransitLayerF />
         {trainState.map((t) => (
-          <MarkerF
+          <AnimatedMarker
             key={t.tripId}
-            position={{ ...t }}
+            position={new google.maps.LatLng({ ...t })}
             icon={{
               path: faSubway.icon[4] as string,
               fillColor: getRouteColour(t.routeName as RouteName),
