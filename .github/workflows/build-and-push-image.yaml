@@ -8,9 +8,6 @@ on:
       registry:
         type: string
         required: true
-    secrets:
-      AWS_DEPLOY_ROLE_ARN:
-        required: true
 
 jobs:
   build-and-push-image:

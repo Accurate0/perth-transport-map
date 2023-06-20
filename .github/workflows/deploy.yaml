@@ -20,8 +20,7 @@ jobs:
     with:
       image-name: perthtransport-api
       registry: ${{ vars.AWS_ECR_API_REGISTRY }}
-    secrets:
-      AWS_DEPLOY_ROLE_ARN: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+    secrets: inherit
 
   build-worker:
     uses: ./.github/workflows/build-and-push-image.yaml
@@ -30,8 +29,7 @@ jobs:
     with:
       image-name: perthtransport-worker
       registry: ${{ vars.AWS_ECR_WORKER_REGISTRY }}
-    secrets:
-      AWS_DEPLOY_ROLE_ARN: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+    secrets: inherit
 
   build-web:
     defaults:
