@@ -11,25 +11,26 @@ concurrency:
 env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  REGISTRY: ghcr.io
+  API_REGISTRY: ${{ secrets.AWS_ECR_API_REGISTRY }}
+  WORKER_REGISTRY: ${{ secrets.AWS_ECR_WORKER_REGISTRY }}
 
 jobs:
   build-api:
     uses: ./.github/workflows/build-and-push-image.yaml
     permissions:
-      contents: read
-      packages: write
+      id-token: write
     with:
       image-name: perthtransport-api
+      registry: ${{ vars.API_REGISTRY }}
     secrets: inherit
 
   build-worker:
     uses: ./.github/workflows/build-and-push-image.yaml
     permissions:
-      contents: read
-      packages: write
+      id-token: write
     with:
       image-name: perthtransport-worker
+      registry: ${{ vars.API_REGISTRY }}
     secrets: inherit
 
   build-web:
@@ -57,33 +58,21 @@ jobs:
           path: ./perthtransport-web/.vercel/output
           if-no-files-found: "error"
 
-  deploy-api:
+  deploy-ecs:
     needs:
       - build-api
       - build-worker
       - build-web
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: deploy
-        run: flyctl deploy --config ./fly.api.toml --wait-timeout 300
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - name: configure oicd aws credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
-  deploy-worker:
-    needs:
-      - build-api
-      - build-worker
-      - build-web
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: deploy
-        run: flyctl deploy --config ./fly.worker.toml
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - name: deploy container
+        run: aws ecs update-service --region ${{ vars.AWS_REGION }} --cluster default-cluster --service perthtransport-service --force-new-deployment 2>&1 1>/dev/null
 
   deploy-web:
     needs:
