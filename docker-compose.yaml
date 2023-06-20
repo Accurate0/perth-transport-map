@@ -4,7 +4,7 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: ./perthtransport-api/Dockerfile
+      dockerfile: ./perthtransport-api/Dockerfile.amd64
       args:
         BUILD_MODE: dev
         BUILD_DIRECTORY: debug
@@ -23,7 +23,7 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: ./perthtransport-worker/Dockerfile
+      dockerfile: ./perthtransport-worker/Dockerfile.amd64
       args:
         BUILD_MODE: dev
         BUILD_DIRECTORY: debug

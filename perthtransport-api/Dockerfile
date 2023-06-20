@@ -1,7 +1,7 @@
-FROM rust:1.70.0-alpine3.18 AS chef
+FROM arm64v8/rust:1.70.0-alpine3.18 AS chef
 
 RUN apk add --no-cache musl-dev
-RUN rustup target add x86_64-unknown-linux-musl
+RUN rustup target add aarch64-unknown-linux-musl
 
 RUN cargo install cargo-chef
 WORKDIR /app
@@ -15,13 +15,13 @@ FROM chef AS builder
 ARG BUILD_MODE=release
 
 COPY --from=planner /app/recipe.json recipe.json
-RUN cargo chef cook --profile ${BUILD_MODE} --recipe-path recipe.json --target x86_64-unknown-linux-musl --bin perthtransport-api
+RUN cargo chef cook --profile ${BUILD_MODE} --recipe-path recipe.json --target aarch64-unknown-linux-musl --bin perthtransport-api
 
 COPY . .
-RUN cargo build --profile ${BUILD_MODE} --bin perthtransport-api --target x86_64-unknown-linux-musl
+RUN cargo build --profile ${BUILD_MODE} --bin perthtransport-api --target aarch64-unknown-linux-musl
 
-FROM alpine:latest AS runtime
+FROM arm64v8/alpine:latest AS runtime
 ARG BUILD_DIRECTORY=release
 
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/${BUILD_DIRECTORY}/perthtransport-api /usr/local/bin
+COPY --from=builder /app/target/aarch64-unknown-linux-musl/${BUILD_DIRECTORY}/perthtransport-api /usr/local/bin
 ENTRYPOINT ["/usr/local/bin/perthtransport-api"]
