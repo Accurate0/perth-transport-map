@@ -11,8 +11,6 @@ concurrency:
 env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  API_REGISTRY: ${{ secrets.AWS_ECR_API_REGISTRY }}
-  WORKER_REGISTRY: ${{ secrets.AWS_ECR_WORKER_REGISTRY }}
 
 jobs:
   build-api:
@@ -21,8 +19,8 @@ jobs:
       id-token: write
     with:
       image-name: perthtransport-api
+      registry: ${{ vars.AWS_ECR_API_REGISTRY }}
     secrets:
-      registry: ${{ secrets.AWS_ECR_API_REGISTRY }}
       AWS_DEPLOY_ROLE_ARN: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
 
   build-worker:
@@ -31,8 +29,8 @@ jobs:
       id-token: write
     with:
       image-name: perthtransport-worker
+      registry: ${{ vars.AWS_ECR_WORKER_REGISTRY }}
     secrets:
-      registry: ${{ secrets.AWS_ECR_WORKER_REGISTRY }}
       AWS_DEPLOY_ROLE_ARN: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
 
   build-web:
