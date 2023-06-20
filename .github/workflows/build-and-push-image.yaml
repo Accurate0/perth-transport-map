@@ -12,7 +12,7 @@ on:
 jobs:
   build-and-push-image:
     name: ${{ inputs.image-name }}
-    runs-on: self-hosted
+    runs-on: ARM64
 
     steps:
       - name: configure oicd aws credentials
