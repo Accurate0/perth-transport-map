@@ -39,4 +39,4 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ${{ inputs.registry }}
-          platforms: linux/arm64,arm64/v8
+          platforms: arm64/v8
