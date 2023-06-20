@@ -62,6 +62,8 @@ jobs:
       - build-worker
       - build-web
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - name: configure oicd aws credentials
         uses: aws-actions/configure-aws-credentials@v2
