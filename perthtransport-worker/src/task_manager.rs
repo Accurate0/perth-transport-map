@@ -120,7 +120,7 @@ impl TaskManager {
     }
 
     pub async fn clean_up_dead_tasks(&self) -> Result<(), anyhow::Error> {
-        tracing::info!("checking status of all known tasks");
+        tracing::debug!("checking status of all known tasks");
         let mut dead_tasks = vec![];
 
         let existing_tasks = self.existing_tasks.read().await;
@@ -131,7 +131,7 @@ impl TaskManager {
             }
         }
 
-        tracing::info!(
+        tracing::debug!(
             "total tasks: {}, dead tasks: {}",
             existing_tasks.keys().len(),
             dead_tasks.len()
@@ -149,7 +149,7 @@ impl TaskManager {
             existing_tasks.remove(&dead_task);
         }
 
-        tracing::info!("removed all dead tasks");
+        tracing::debug!("removed all dead tasks");
         Ok(())
     }
 }
