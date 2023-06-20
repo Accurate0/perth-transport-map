@@ -7,6 +7,7 @@ pub fn init_logger() {
         .with_max_level(tracing::Level::INFO)
         .without_time()
         .with_thread_ids(true)
+        .with_ansi(false)
         .init()
 }
 
