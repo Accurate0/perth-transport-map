@@ -21,8 +21,8 @@ jobs:
       id-token: write
     with:
       image-name: perthtransport-api
-      registry: ${{ vars.API_REGISTRY }}
-    secrets: inherit
+    secrets:
+      registry: ${{ secrets.AWS_ECR_API_REGISTRY }}
 
   build-worker:
     uses: ./.github/workflows/build-and-push-image.yaml
@@ -30,8 +30,8 @@ jobs:
       id-token: write
     with:
       image-name: perthtransport-worker
-      registry: ${{ vars.API_REGISTRY }}
-    secrets: inherit
+    secrets:
+      registry: ${{ secrets.AWS_ECR_WORKER_REGISTRY }}
 
   build-web:
     defaults:
