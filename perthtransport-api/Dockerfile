@@ -18,7 +18,7 @@ COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --profile ${BUILD_MODE} --recipe-path recipe.json --target aarch64-unknown-linux-musl
 
 COPY . .
-RUN cargo build --frozen --profile ${BUILD_MODE} --bin perthtransport-api --target aarch64-unknown-linux-musl
+RUN cargo build --profile ${BUILD_MODE} --bin perthtransport-api --target aarch64-unknown-linux-musl
 
 FROM arm64v8/alpine:latest AS runtime
 ARG BUILD_DIRECTORY=release
