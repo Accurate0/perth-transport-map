@@ -9,13 +9,13 @@ WORKDIR /app
 FROM chef AS planner
 
 COPY . .
-RUN cargo chef prepare --recipe-path recipe.json --bin perthtransport-api
+RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder
 ARG BUILD_MODE=release
 
 COPY --from=planner /app/recipe.json recipe.json
-RUN cargo chef cook --profile ${BUILD_MODE} --recipe-path recipe.json --target aarch64-unknown-linux-musl --bin perthtransport-api
+RUN cargo chef cook --profile ${BUILD_MODE} --recipe-path recipe.json --target aarch64-unknown-linux-musl
 
 COPY . .
 RUN cargo build --profile ${BUILD_MODE} --bin perthtransport-api --target aarch64-unknown-linux-musl
