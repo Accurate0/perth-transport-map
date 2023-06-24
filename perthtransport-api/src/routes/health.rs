@@ -14,6 +14,8 @@ pub async fn health_check(State(state): State<AppState>) -> Result<StatusCode, S
     let mut pubsub = state.redis.get_async_connection().await?.into_pubsub();
     let mut connection = state.redis.get_async_connection().await?;
 
+    // publish a guid to send back on
+    // individual healthcheck without conflict
     pubsub.subscribe(PUBSUB_CHANNEL_WORKER_HEALTH_OUT).await?;
     connection
         .publish(PUBSUB_CHANNEL_WORKER_HEALTH_IN, "hey")
