@@ -1,5 +1,7 @@
 import { InfoWindowF, MarkerF, MarkerProps } from "@react-google-maps/api";
 import { ReactNode, useEffect, useRef, useState } from "react";
+import useGetMarkerIcon from "../hooks/useGetMarkerIcon";
+import useDarkMode from "../hooks/useDarkMode";
 
 type AnimatedMarker = google.maps.Marker & {
   __startPosition_lat: number;
@@ -82,14 +84,18 @@ function animateMarkerTo(
 
 type AnimatedMarkerProps = MarkerProps & {
   infoWindowChildren: ReactNode;
+  routeName: string;
 };
 
 export const AnimatedMarker: React.FC<AnimatedMarkerProps> = ({
   infoWindowChildren,
+  routeName,
   ...props
 }) => {
   const markerRef = useRef<google.maps.Marker>();
   const [position, setPosition] = useState(props.position);
+  const { isDarkMode } = useDarkMode();
+  const getMarkerIcon = useGetMarkerIcon();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -100,6 +106,12 @@ export const AnimatedMarker: React.FC<AnimatedMarkerProps> = ({
     );
   }, [props.position]);
 
+  useEffect(() => {
+    if (markerRef.current) {
+      markerRef.current.setIcon(getMarkerIcon(routeName));
+    }
+  }, [isDarkMode]);
+
   return (
     <MarkerF
       {...props}
@@ -108,6 +120,7 @@ export const AnimatedMarker: React.FC<AnimatedMarkerProps> = ({
         setOpen(true);
         props.onClick?.(e);
       }}
+      icon={getMarkerIcon(routeName)}
       onLoad={(marker) => (markerRef.current = marker)}
     >
       {open && (

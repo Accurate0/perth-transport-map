@@ -7,8 +7,7 @@ import { useMemo, useState } from "react";
 import lightStyles from "./styles.light.json";
 import darkStyles from "./styles.dark.json";
 import useWebSocket from "../../hooks/useWebSocket";
-import { faSubway } from "@fortawesome/free-solid-svg-icons";
-import { RouteName, useGetRouteColour } from "../../utils/getRouteColour";
+import { RouteName, useGetRouteColour } from "../../hooks/useGetRouteColour";
 import DarkModeToggle from "../../components/DarkModeToggle";
 import useDarkMode from "../../hooks/useDarkMode";
 import { AnimatedMarker } from "../../components/AnimatedMarker";
@@ -29,7 +28,6 @@ interface RealTime {
 const MapRoute = () => {
   const { isHealthy } = useHealthCheck();
   const { isDarkMode } = useDarkMode();
-  const getRouteColour = useGetRouteColour();
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_MAPS_API_KEY as string,
@@ -111,10 +109,9 @@ const MapRoute = () => {
         }}
       >
         <TransitLayerF />
-
         {trainState.map((t) => (
-          // TODO: add on click information
           <AnimatedMarker
+            routeName={t.routeName}
             key={t.tripId}
             infoWindowChildren={
               <>
@@ -129,16 +126,6 @@ const MapRoute = () => {
               </>
             }
             position={new google.maps.LatLng({ ...t })}
-            icon={{
-              path: faSubway.icon[4] as string,
-              fillColor: getRouteColour(t.routeName as RouteName),
-              fillOpacity: 1,
-              anchor: new google.maps.Point(
-                faSubway.icon[0] / 2, // width
-                faSubway.icon[1] // height
-              ),
-              scale: 0.035,
-            }}
           />
         ))}
       </GoogleMap>
