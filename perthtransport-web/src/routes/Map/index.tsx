@@ -119,16 +119,13 @@ const MapRoute = () => {
             infoWindowChildren={
               <>
                 <Typography variant="subtitle2">{t.routeName}</Typography>
-                {t.nextStopName && (
-                  <Typography component="p" variant="caption">
-                    Next: {t.nextStopName}
-                  </Typography>
-                )}
-                {t.nextStopEstimated && (
-                  <Typography component="p" variant="caption">
-                    Estimated: {t.nextStopEstimated.toLocaleTimeString()}
-                  </Typography>
-                )}
+                <Typography component="p" variant="caption">
+                  Next: {t.nextStopName ?? "Unknown"}
+                </Typography>
+                <Typography component="p" variant="caption">
+                  Estimated:{" "}
+                  {t.nextStopEstimated?.toLocaleTimeString() ?? "Unknown"}
+                </Typography>
               </>
             }
             position={new google.maps.LatLng({ ...t })}
