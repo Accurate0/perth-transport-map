@@ -1,3 +1,5 @@
+![It moves](./resources/output.gif)
+
 ### TODO:
 - [x] guid per websocket
 - [x] send in request
