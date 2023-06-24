@@ -2,9 +2,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  my-job:
+  clear-cache:
     name: Delete all caches
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
 
     steps:
       - name: Clear caches
