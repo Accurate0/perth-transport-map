@@ -36,18 +36,16 @@ pub async fn handle_message(
                             .create_websocket_session(socket_id.clone())
                             .await?;
 
-                        let mut redis_multiplexed_read = redis_multiplexed.write().await;
+                        // TODO: fix this, long-ish lock hold
+                        let mut redis_multiplexed_lock = redis_multiplexed.write().await;
                         let live_trip_ids = serde_json::from_str::<Vec<String>>(
-                            &redis_multiplexed_read
+                            &redis_multiplexed_lock
                                 .get::<_, String>(ACTIVE_TRAINS_KEY)
                                 .await?,
                         )?;
 
-                        std::mem::drop(redis_multiplexed_read);
-
                         // TODO: why do i need a delay, seems like firefox only... very cool
                         tokio::time::sleep(Duration::from_millis(100)).await;
-                        let mut redis_multiplexed_lock = redis_multiplexed.write().await;
                         for trip_id in live_trip_ids {
                             if redis_multiplexed_lock
                                 .exists(format!("{}_{}", DO_NOT_TRACK_KEY_PREFIX, trip_id))
