@@ -110,57 +110,7 @@ pub async fn handle_message(
                         Ok(())
                     }
                     PubSubAction::TripAdd => {
-                        // TODO: logic duplicated above
-                        let trip_id = message.trip_id.context("trip add must have trip id")?;
-
-                        let task_created = task_manager
-                            .add_task_to_websocket_session(
-                                message.socket_id.clone(),
-                                trip_id.clone(),
-                                || {
-                                    let http_client = http_client.clone();
-                                    let span =
-                                        tracing::span!(Level::INFO, "trip_task", trip_id = trip_id);
-                                    let trip_id_cloned = trip_id.clone();
-                                    let config = config.clone();
-                                    let worker_tx = worker_tx.clone();
-
-                                    tokio::spawn(async move {
-                                        if let Err(e) = handle_trip(
-                                            http_client,
-                                            worker_tx,
-                                            config,
-                                            trip_id_cloned,
-                                        )
-                                        .instrument(span)
-                                        .await
-                                        {
-                                            tracing::error!("task failed with {}", e)
-                                        }
-                                    })
-                                },
-                            )
-                            .await?;
-
-                        if !task_created {
-                            tracing::info!("getting value from cache as task already exists");
-                            let mut redis_multiplexed = redis_multiplexed.write().await;
-                            let cache_value = redis_multiplexed
-                                .get::<_, String>(format!("{}_{}", CACHE_KEY_PREFIX, trip_id))
-                                .await;
-
-                            if let Ok(cache_value) = cache_value {
-                                redis_multiplexed
-                                    .publish(
-                                        format!(
-                                            "{}_{}",
-                                            PUBSUB_CHANNEL_OUT_PREFIX, message.socket_id
-                                        ),
-                                        cache_value,
-                                    )
-                                    .await?
-                            }
-                        }
+                        tracing::info!("ignoring event: {:?}", message);
 
                         Ok(())
                     }

@@ -9,7 +9,7 @@ pub struct WebSocketMessage {
     pub trip_id: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct PubSubMessage {
     pub action: PubSubAction,
