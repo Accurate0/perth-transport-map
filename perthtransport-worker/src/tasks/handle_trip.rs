@@ -115,19 +115,16 @@ pub async fn handle_trip(
             }
         }
 
-        if pta_realtime_converted.current_position.latitude == 0f64
-            && pta_realtime_converted.current_position.longitude == 0f64
-        {
-            // literally what the fuck
-            tracing::warn!("longitude and latitude == 0, ignoring...");
-        } else {
-            worker_tx
-                .send_async(WorkerMessage::HasMessage(MessageContents {
-                    response: pta_realtime_converted,
-                    trip_id: trip_id.clone(),
-                }))
-                .await?;
-        }
+        let publish = pta_realtime_converted.current_position.latitude != 0f64
+            && pta_realtime_converted.current_position.longitude != 0f64;
+
+        worker_tx
+            .send_async(WorkerMessage::HasMessage(MessageContents {
+                response: pta_realtime_converted,
+                trip_id: trip_id.clone(),
+                publish,
+            }))
+            .await?;
 
         let sleep_duration = 30;
         tracing::info!("task sleeping for {}", sleep_duration);

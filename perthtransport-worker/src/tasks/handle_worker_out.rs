@@ -37,7 +37,7 @@ pub async fn handle_worker_out(
                         if websockets.is_empty() {
                             tracing::info!("[{}] no associated websocket sessions", trip_id);
                             task_manager.abort_task(&trip_id).await
-                        } else {
+                        } else if message.publish {
                             for socket_id in websockets {
                                 tracing::info!("[{}] sending to {}", trip_id, socket_id);
                                 redis

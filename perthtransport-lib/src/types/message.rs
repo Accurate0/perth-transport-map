@@ -29,6 +29,7 @@ pub enum PubSubAction {
 pub struct MessageContents {
     pub response: RealTimeResponse,
     pub trip_id: String,
+    pub publish: bool,
 }
 
 #[derive(Serialize, Deserialize)]
