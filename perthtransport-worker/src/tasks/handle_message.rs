@@ -45,7 +45,7 @@ pub async fn handle_message(
 
                         std::mem::drop(redis_multiplexed_read);
 
-                        // TODO: why do i need a delay
+                        // TODO: why do i need a delay, seems like firefox only... very cool
                         tokio::time::sleep(Duration::from_millis(100)).await;
                         let mut redis_multiplexed_lock = redis_multiplexed.write().await;
                         for trip_id in live_trip_ids {
