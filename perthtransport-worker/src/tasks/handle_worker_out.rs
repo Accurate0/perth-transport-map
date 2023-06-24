@@ -57,7 +57,7 @@ pub async fn handle_worker_out(
                 }
             }
             WorkerMessage::DoNotTrack(trip_id) => {
-                let expiry = 600;
+                let expiry = 100;
                 tracing::info!("setting {} to Do Not Track for {} seconds", trip_id, expiry);
                 redis
                     .set_ex(
