@@ -17,7 +17,7 @@ pub struct PubSubMessage {
     pub trip_id: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum PubSubAction {
     Hello,
     TripAdd,
