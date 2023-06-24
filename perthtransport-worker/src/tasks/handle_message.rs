@@ -2,10 +2,10 @@ use super::handle_trip;
 use crate::task_manager::TaskManager;
 use anyhow::Context;
 use flume::Sender;
-use futures_util::future::join_all;
 use perthtransport::{
-    constants::{CACHE_KEY_PREFIX, PUBSUB_CHANNEL_OUT_PREFIX},
-    query,
+    constants::{
+        ACTIVE_TRAINS_KEY, CACHE_KEY_PREFIX, DO_NOT_TRACK_KEY_PREFIX, PUBSUB_CHANNEL_OUT_PREFIX,
+    },
     types::{
         config::ApplicationConfig,
         message::{PubSubAction, PubSubMessage, WorkerMessage},
@@ -30,43 +30,32 @@ pub async fn handle_message(
             if let Ok(message) = message {
                 match message.action {
                     PubSubAction::Hello => {
+                        // TODO: use a background thread that automatically changes current trains for all websockets every x mins
                         let socket_id = message.socket_id.clone();
                         task_manager
                             .create_websocket_session(socket_id.clone())
                             .await?;
 
-                        let trains = vec![
-                            // Airport Line
-                            "PerthRestricted:RTG_16",
-                            // Midland Line
-                            "PerthRestricted:RTG_15",
-                            // Armadale Line
-                            "PerthRestricted:RTG_12",
-                            // Mandurah Line
-                            "PerthRestricted:RTG_14",
-                            // Thornlie Line
-                            "PerthRestricted:RTG_13",
-                            // Fremantle Line
-                            "PerthRestricted:RTG_11",
-                            // Joondalup Line
-                            "PerthRestricted:RTG_10",
-                        ];
+                        let mut redis_multiplexed_read = redis_multiplexed.write().await;
+                        let live_trip_ids = serde_json::from_str::<Vec<String>>(
+                            &redis_multiplexed_read
+                                .get::<_, String>(ACTIVE_TRAINS_KEY)
+                                .await?,
+                        )?;
 
-                        let live_trip_ids: Vec<String> =
-                            join_all(trains.iter().map(|timetable_id| {
-                                query::get_live_trips_for(
-                                    timetable_id,
-                                    &config,
-                                    http_client.clone(),
-                                )
-                            }))
-                            .await
-                            .iter()
-                            .filter_map(|x| x.as_ref().ok())
-                            .flat_map(|x| x.live_trips.clone())
-                            .collect();
+                        std::mem::drop(redis_multiplexed_read);
 
                         for trip_id in live_trip_ids {
+                            // TODO: check if in cache key
+                            let mut redis_multiplexed_lock = redis_multiplexed.write().await;
+                            if redis_multiplexed_lock
+                                .exists(format!("{}_{}", DO_NOT_TRACK_KEY_PREFIX, trip_id))
+                                .await?
+                            {
+                                tracing::warn!("[{}] exists in cache as 'Do Not Track'", trip_id);
+                                continue;
+                            }
+
                             let task_created = task_manager
                                 .add_task_to_websocket_session(
                                     socket_id.clone(),
@@ -101,13 +90,12 @@ pub async fn handle_message(
 
                             if !task_created {
                                 tracing::info!("getting value from cache as task already exists");
-                                let mut redis_multiplexed = redis_multiplexed.write().await;
-                                let cache_value = redis_multiplexed
+                                let cache_value = redis_multiplexed_lock
                                     .get::<_, String>(format!("{}_{}", CACHE_KEY_PREFIX, trip_id))
                                     .await;
 
                                 if let Ok(cache_value) = cache_value {
-                                    redis_multiplexed
+                                    redis_multiplexed_lock
                                         .publish(
                                             format!(
                                                 "{}_{}",

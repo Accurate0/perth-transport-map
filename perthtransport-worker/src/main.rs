@@ -76,12 +76,33 @@ async fn main() -> Result<(), anyhow::Error> {
         }
     }));
 
+    let active_trains_task_manager = Arc::clone(&task_manager);
+    let active_trains_redis_connection = redis.get_multiplexed_async_connection().await?;
+    let span = tracing::span!(Level::INFO, "active_trains");
+    let active_trains_http_client = Arc::clone(&http_client);
+    let active_trains_config = Arc::clone(&config);
+
+    let active_trains_handle = Arc::new(tokio::spawn(async move {
+        if let Err(e) = tasks::handle_active_trains(
+            active_trains_task_manager,
+            active_trains_config,
+            active_trains_http_client,
+            active_trains_redis_connection,
+        )
+        .instrument(span)
+        .await
+        {
+            tracing::error!("error handling active trains task: {}", e)
+        }
+    }));
+
     loop {
         let http_client = Arc::clone(&http_client);
         let redis_multiplexed = Arc::clone(&redis_multiplexed);
         let task_manager = Arc::clone(&task_manager);
         let worker_out_handle = Arc::clone(&worker_out_handle);
         let task_manager_out_handle = Arc::clone(&task_manager_out_handle);
+        let active_trains_handle = Arc::clone(&active_trains_handle);
         let worker_tx = worker_tx.clone();
         let config = Arc::clone(&config);
         let message = redis_pubsub.on_message().next().await;
@@ -95,6 +116,7 @@ async fn main() -> Result<(), anyhow::Error> {
                     handle_healthcheck(
                         worker_out_handle,
                         task_manager_out_handle,
+                        active_trains_handle,
                         redis_multiplexed,
                         task_manager,
                     )

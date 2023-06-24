@@ -26,7 +26,14 @@ pub enum PubSubAction {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct WorkerMessage {
+pub struct MessageContents {
     pub response: RealTimeResponse,
     pub trip_id: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum WorkerMessage {
+    HasMessage(MessageContents),
+    DoNotTrack(String),
 }

@@ -9,19 +9,22 @@ use tokio::{sync::RwLock, task::JoinHandle};
 pub async fn handle_healthcheck(
     worker_out_handle: Arc<JoinHandle<()>>,
     task_manager_out_handle: Arc<JoinHandle<()>>,
+    active_trains_handle: Arc<JoinHandle<()>>,
     redis_multiplexed: Arc<RwLock<redis::aio::MultiplexedConnection>>,
     task_manager: Arc<TaskManager>,
 ) -> Result<(), anyhow::Error> {
     tracing::info!("health check received");
+    let active_trains_healthy = !active_trains_handle.is_finished();
     let worker_output_healthy = !worker_out_handle.is_finished();
     let task_manager_healthy =
         task_manager.is_healthy().await && !task_manager_out_handle.is_finished();
     let mut redis_connection = redis_multiplexed.write().await;
 
     tracing::info!(
-        "task_manager: {}, worker_output: {}",
+        "task_manager: {}, worker_output: {}, active_trains: {}",
         task_manager_healthy,
-        worker_output_healthy
+        worker_output_healthy,
+        active_trains_healthy
     );
 
     redis_connection
@@ -30,6 +33,7 @@ pub async fn handle_healthcheck(
             serde_json::to_string(&WorkerHealthStatus {
                 worker_output_healthy,
                 task_manager_healthy,
+                active_trains_healthy,
             })?,
         )
         .await?;

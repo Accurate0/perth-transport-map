@@ -27,13 +27,17 @@ pub async fn health_check(State(state): State<AppState>) -> Result<StatusCode, S
                 let worker_health =
                     serde_json::from_str::<WorkerHealthStatus>(&m.get_payload::<String>()?)?;
 
-                if worker_health.task_manager_healthy && worker_health.worker_output_healthy {
+                if worker_health.task_manager_healthy
+                    && worker_health.worker_output_healthy
+                    && worker_health.active_trains_healthy
+                {
                     Ok(StatusCode::NO_CONTENT)
                 } else {
                     tracing::error!(
-                        "task_manager: {}, worker_output: {}",
+                        "task_manager: {}, worker_output: {}, active_trains: {}",
                         worker_health.task_manager_healthy,
-                        worker_health.worker_output_healthy
+                        worker_health.worker_output_healthy,
+                        worker_health.active_trains_healthy
                     );
 
                     Ok(StatusCode::SERVICE_UNAVAILABLE)

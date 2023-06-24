@@ -1,5 +1,5 @@
-import { MarkerF, MarkerProps } from "@react-google-maps/api";
-import { useEffect, useRef, useState } from "react";
+import { InfoWindowF, MarkerF, MarkerProps } from "@react-google-maps/api";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 type AnimatedMarker = google.maps.Marker & {
   __startPosition_lat: number;
@@ -80,9 +80,17 @@ function animateMarkerTo(
   animateStep(marker, new Date().getTime());
 }
 
-export const AnimatedMarker: React.FC<MarkerProps> = (props) => {
+type AnimatedMarkerProps = MarkerProps & {
+  infoWindowChildren: ReactNode;
+};
+
+export const AnimatedMarker: React.FC<AnimatedMarkerProps> = ({
+  infoWindowChildren,
+  ...props
+}) => {
   const markerRef = useRef<google.maps.Marker>();
   const [position, setPosition] = useState(props.position);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     animateMarkerTo(
@@ -96,7 +104,17 @@ export const AnimatedMarker: React.FC<MarkerProps> = (props) => {
     <MarkerF
       {...props}
       position={position}
+      onClick={(e) => {
+        setOpen(true);
+        props.onClick?.(e);
+      }}
       onLoad={(marker) => (markerRef.current = marker)}
-    />
+    >
+      {open && (
+        <InfoWindowF onCloseClick={() => setOpen(false)} position={position}>
+          {infoWindowChildren}
+        </InfoWindowF>
+      )}
+    </MarkerF>
   );
 };

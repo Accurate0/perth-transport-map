@@ -7,7 +7,7 @@ use perthtransport::{
     constants::{TRANSPERTH_EARLY_HOURS, TRANSPERTH_REAL_TIME_API},
     types::{
         config::ApplicationConfig,
-        message::WorkerMessage,
+        message::{MessageContents, WorkerMessage},
         response::realtime::{RealTimeResponse, TransitStopStatus},
         transperth::realtime::{PTARealTimeRequest, PTARealTimeResponse},
     },
@@ -106,19 +106,24 @@ pub async fn handle_trip(
                 .as_ref()
                 .is_some_and(|x| x.trip_status == TransitStopStatus::Scheduled)
             {
+                worker_tx
+                    .send_async(WorkerMessage::DoNotTrack(trip_id))
+                    .await?;
+
                 tracing::warn!("this trip is scheduled for first station, no point tracking");
                 break Ok(());
             }
         }
 
         worker_tx
-            .send_async(WorkerMessage {
+            .send_async(WorkerMessage::HasMessage(MessageContents {
                 response: pta_realtime_converted,
                 trip_id: trip_id.clone(),
-            })
+            }))
             .await?;
 
-        tracing::info!("task sleeping");
-        tokio::time::sleep(Duration::from_secs(30)).await;
+        let sleep_duration = 30;
+        tracing::info!("task sleeping for {}", sleep_duration);
+        tokio::time::sleep(Duration::from_secs(sleep_duration)).await;
     }
 }

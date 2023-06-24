@@ -12,6 +12,17 @@ import { RouteName, useGetRouteColour } from "../../utils/getRouteColour";
 import DarkModeToggle from "../../components/DarkModeToggle";
 import useDarkMode from "../../hooks/useDarkMode";
 import { AnimatedMarker } from "../../components/AnimatedMarker";
+import { RealTimeMessage } from "../../types";
+import { Typography } from "@mui/material";
+
+interface RealTime {
+  lat: number;
+  lng: number;
+  tripId: string;
+  routeName: string;
+  nextStopName?: string;
+  nextStopEstimated?: Date;
+}
 
 const MapRoute = () => {
   const { isDarkMode } = useDarkMode();
@@ -22,30 +33,35 @@ const MapRoute = () => {
   });
 
   const onMessage = (data: string) => {
-    const jsonData = JSON.parse(data);
+    const info = JSON.parse(data) as RealTimeMessage;
 
-    setTrainState((prev) => [
-      ...prev.filter((x) => x.tripId !== jsonData["tripId"]),
-      {
-        // TODO: types :)
-        lat: jsonData["currentPosition"]["latitude"],
-        lng: jsonData["currentPosition"]["longitude"],
-        tripId: jsonData["tripId"],
-        routeName: jsonData["routeName"],
-      },
-    ]);
+    setTrainState((prev) => {
+      const nextStop = info.transitStops.find(
+        (t) => t.realTimeInfo?.tripStatus === "Scheduled"
+      );
+
+      const nextStopEstimatedArrival =
+        nextStop?.realTimeInfo?.estimatedArrivalTime;
+
+      return [
+        ...prev.filter((x) => x.tripId !== info.tripId),
+        {
+          lat: info.currentPosition.latitude,
+          lng: info.currentPosition.longitude,
+          tripId: info.tripId,
+          routeName: info.routeName,
+          nextStopName: nextStop?.description,
+          nextStopEstimated: nextStopEstimatedArrival
+            ? new Date(`1970-01-01T${nextStopEstimatedArrival}`)
+            : undefined,
+        },
+      ];
+    });
   };
 
   useWebSocket(onMessage);
 
-  const [trainState, setTrainState] = useState<
-    {
-      lat: number;
-      lng: number;
-      tripId: string;
-      routeName: string;
-    }[]
-  >([]);
+  const [trainState, setTrainState] = useState<RealTime[]>([]);
 
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({
@@ -96,6 +112,21 @@ const MapRoute = () => {
           // TODO: add on click information
           <AnimatedMarker
             key={t.tripId}
+            infoWindowChildren={
+              <>
+                <Typography variant="subtitle2">{t.routeName}</Typography>
+                {t.nextStopName && (
+                  <Typography component="p" variant="caption">
+                    Next: {t.nextStopName}
+                  </Typography>
+                )}
+                {t.nextStopEstimated && (
+                  <Typography component="p" variant="caption">
+                    Estimated: {t.nextStopEstimated.toLocaleTimeString()}
+                  </Typography>
+                )}
+              </>
+            }
             position={new google.maps.LatLng({ ...t })}
             icon={{
               path: faSubway.icon[4] as string,

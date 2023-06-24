@@ -1,6 +1,5 @@
-use std::{sync::Arc, time::Duration};
-
 use crate::task_manager::TaskManager;
+use std::{sync::Arc, time::Duration};
 
 pub async fn handle_task_manager(task_manager: Arc<TaskManager>) -> Result<(), anyhow::Error> {
     loop {

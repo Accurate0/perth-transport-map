@@ -5,4 +5,5 @@ use serde::{Deserialize, Serialize};
 pub struct WorkerHealthStatus {
     pub worker_output_healthy: bool,
     pub task_manager_healthy: bool,
+    pub active_trains_healthy: bool,
 }
