@@ -7,7 +7,6 @@ import { useMemo, useState } from "react";
 import lightStyles from "./styles.light.json";
 import darkStyles from "./styles.dark.json";
 import useWebSocket from "../../hooks/useWebSocket";
-import { RouteName, useGetRouteColour } from "../../hooks/useGetRouteColour";
 import DarkModeToggle from "../../components/DarkModeToggle";
 import useDarkMode from "../../hooks/useDarkMode";
 import { AnimatedMarker } from "../../components/AnimatedMarker";
