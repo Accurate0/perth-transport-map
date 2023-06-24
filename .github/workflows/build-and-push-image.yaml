@@ -13,7 +13,7 @@ jobs:
   build-and-push-image:
     name: ${{ inputs.image-name }}
     runs-on: ubuntu-latest
-    # runs-on: ARM64 # use when no cache?
+    # runs-on: self-host # use when no cache?
 
     steps:
       - name: configure oicd aws credentials
