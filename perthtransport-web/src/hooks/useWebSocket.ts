@@ -2,9 +2,7 @@ import { useAtom } from "jotai";
 import { atom } from "jotai";
 import { useEffect, useState } from "react";
 
-const webSocket = atom<WebSocket>(
-  new WebSocket(import.meta.env.VITE_WS_API_BASE ?? "")
-);
+const webSocket = atom<WebSocket>(new WebSocket(import.meta.env.VITE_WS ?? ""));
 
 const useWebSocket = (onMessage: (data: string) => void) => {
   const [socket] = useAtom(webSocket);

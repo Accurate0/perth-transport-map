@@ -14,6 +14,8 @@ import useDarkMode from "../../hooks/useDarkMode";
 import { AnimatedMarker } from "../../components/AnimatedMarker";
 import { RealTimeMessage } from "../../types";
 import { Typography } from "@mui/material";
+import useHealthCheck from "../../hooks/useHealthCheck";
+import HealthStatus from "../../components/HealthStatus";
 
 interface RealTime {
   lat: number;
@@ -25,6 +27,7 @@ interface RealTime {
 }
 
 const MapRoute = () => {
+  const { isHealthy } = useHealthCheck();
   const { isDarkMode } = useDarkMode();
   const getRouteColour = useGetRouteColour();
 
@@ -96,6 +99,7 @@ const MapRoute = () => {
   return (
     <>
       <DarkModeToggle />
+      <HealthStatus isHealthy={isHealthy} />
       <GoogleMap
         options={mapOptions}
         zoom={zoomLevel}

@@ -12,7 +12,7 @@ use perthtransport::{
     },
 };
 use redis::{AsyncCommands, Msg};
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 use tokio::sync::RwLock;
 use tracing::{Instrument, Level};
 
@@ -45,9 +45,10 @@ pub async fn handle_message(
 
                         std::mem::drop(redis_multiplexed_read);
 
+                        // TODO: why do i need a delay
+                        tokio::time::sleep(Duration::from_millis(100)).await;
+                        let mut redis_multiplexed_lock = redis_multiplexed.write().await;
                         for trip_id in live_trip_ids {
-                            // TODO: check if in cache key
-                            let mut redis_multiplexed_lock = redis_multiplexed.write().await;
                             if redis_multiplexed_lock
                                 .exists(format!("{}_{}", DO_NOT_TRACK_KEY_PREFIX, trip_id))
                                 .await?

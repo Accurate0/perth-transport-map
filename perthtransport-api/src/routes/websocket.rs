@@ -74,8 +74,9 @@ async fn handle_outgoing(
     loop {
         let msg = redis.on_message().next().await;
         if let Some(msg) = msg {
+            let payload = msg.get_payload()?;
             tracing::info!("message recieved");
-            let _ = sender.send(Message::Text(msg.get_payload().unwrap())).await;
+            let _ = sender.send(Message::Text(payload)).await;
         }
     }
 }

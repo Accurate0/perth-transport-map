@@ -72,7 +72,7 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: deploy container
-        run: aws ecs update-service --region ${{ vars.AWS_REGION }} --cluster default-cluster --service perthtransport-service --force-new-deployment 2>&1 1>/dev/null
+        run: aws ecs update-service --region ${{ vars.AWS_REGION }} --cluster oracle-cluster --service perthtransport-service --force-new-deployment 2>&1 1>/dev/null
 
   deploy-web:
     needs:
