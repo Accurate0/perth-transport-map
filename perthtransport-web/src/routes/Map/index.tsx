@@ -14,6 +14,8 @@ import { RealTimeMessage } from "../../types";
 import { Typography } from "@mui/material";
 import useHealthCheck from "../../hooks/useHealthCheck";
 import HealthStatus from "../../components/HealthStatus";
+import { RouteName, useGetRouteColour } from "../../hooks/useGetRouteColour";
+import { faSubway } from "@fortawesome/free-solid-svg-icons";
 
 interface RealTime {
   lat: number;
@@ -27,7 +29,7 @@ interface RealTime {
 const MapRoute = () => {
   const { isHealthy } = useHealthCheck();
   const { isDarkMode } = useDarkMode();
-
+  const getRouteColour = useGetRouteColour();
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_MAPS_API_KEY as string,
   });
@@ -110,9 +112,20 @@ const MapRoute = () => {
         <TransitLayerF />
         {trainState.map((t) => (
           <AnimatedMarker
-            routeName={t.routeName}
             key={t.tripId}
-            infoWindowChildren={
+            options={{
+              icon: {
+                path: faSubway.icon[4] as string,
+                fillColor: getRouteColour(t.routeName as RouteName),
+                fillOpacity: 1,
+                anchor: new google.maps.Point(
+                  faSubway.icon[0] / 2, // width
+                  faSubway.icon[1] // height
+                ),
+                scale: 0.035,
+              },
+            }}
+            infoWindowContents={
               <>
                 <Typography variant="subtitle2">{t.routeName}</Typography>
                 <Typography component="p" variant="caption">
