@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
 
-# concurrency:
-#   group: ${{ github.ref }}-${{ github.workflow }}
-#   cancel-in-progress: false
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: false
 
 env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
