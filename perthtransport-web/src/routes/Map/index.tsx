@@ -54,7 +54,10 @@ const MapRoute = () => {
           routeName: info.routeName,
           nextStopName: nextStop?.description,
           nextStopEstimated: nextStopEstimatedArrival
-            ? new Date(`1970-01-01T${nextStopEstimatedArrival}`)
+            ? // has 1. at the start when past midnight????????
+              new Date(
+                `1970-01-01T${nextStopEstimatedArrival.replace("1.", "")}`
+              )
             : undefined,
         },
       ];
