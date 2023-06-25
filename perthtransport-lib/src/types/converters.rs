@@ -24,7 +24,12 @@ impl TryFrom<PTARealTimeResponse> for RealTimeResponse {
                     description: t.transit_stop.description.clone(),
                     real_time_info: t.real_time_info.as_ref().map(|rti| RealTimeInfo {
                         trip_status: rti.real_time_trip_status.into(),
-                        estimated_arrival_time: rti.estimated_arrival_time.clone(),
+                        // has 1. at the start when past midnight????????
+                        // what the actual FUCK
+                        estimated_arrival_time: rti
+                            .estimated_arrival_time
+                            .clone()
+                            .map(|x| x.replace("1.", "")),
                         estimated_departure_time: rti.estimated_departure_time.clone(),
                     }),
                 })
