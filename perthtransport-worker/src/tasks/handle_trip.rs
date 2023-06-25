@@ -103,7 +103,7 @@ pub async fn handle_trip(
             if first_stop
                 .real_time_info
                 .as_ref()
-                .is_some_and(|x| x.real_time_trip_status == TransitStopStatus::AtStation as i64)
+                .is_some_and(|x| x.real_time_trip_status == TransitStopStatus::Scheduled as i64)
             {
                 worker_tx
                     .send_async(WorkerMessage::DoNotTrack(trip_id))
