@@ -35,6 +35,6 @@ pub struct MessageContents {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum WorkerMessage {
-    HasMessage(MessageContents),
+    HasMessage(Box<MessageContents>),
     DoNotTrack(String),
 }

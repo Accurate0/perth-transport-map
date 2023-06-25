@@ -25,7 +25,7 @@ export interface RealTimeMessage {
   currentPosition: CurrentPosition;
   lastUpdated: string;
   startTime: string;
-  transitStops: TransitStop[];
+  nextStop: TransitStop | null;
 }
 
 export interface CurrentPosition {

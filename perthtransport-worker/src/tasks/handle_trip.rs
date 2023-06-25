@@ -99,12 +99,11 @@ pub async fn handle_trip(
             pta_realtime
         }?;
 
-        let pta_realtime_converted = RealTimeResponse::try_from(pta_realtime)?;
-        if let Some(first_stop) = pta_realtime_converted.transit_stops.first() {
+        if let Some(first_stop) = pta_realtime.trip_stops.first() {
             if first_stop
                 .real_time_info
                 .as_ref()
-                .is_some_and(|x| x.trip_status == TransitStopStatus::Scheduled)
+                .is_some_and(|x| x.real_time_trip_status == TransitStopStatus::AtStation as i64)
             {
                 worker_tx
                     .send_async(WorkerMessage::DoNotTrack(trip_id))
@@ -115,15 +114,16 @@ pub async fn handle_trip(
             }
         }
 
+        let pta_realtime_converted = RealTimeResponse::try_from(pta_realtime)?;
         let publish = pta_realtime_converted.current_position.latitude != 0f64
             && pta_realtime_converted.current_position.longitude != 0f64;
 
         worker_tx
-            .send_async(WorkerMessage::HasMessage(MessageContents {
+            .send_async(WorkerMessage::HasMessage(Box::new(MessageContents {
                 response: pta_realtime_converted,
                 trip_id: trip_id.clone(),
                 publish,
-            }))
+            })))
             .await?;
 
         let sleep_duration = 30;

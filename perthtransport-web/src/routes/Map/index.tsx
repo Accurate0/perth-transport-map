@@ -38,13 +38,6 @@ const MapRoute = () => {
     const info = JSON.parse(data) as RealTimeMessage;
 
     setTrainState((prev) => {
-      const nextStop = info.transitStops.find(
-        (t) => t.realTimeInfo?.tripStatus === "Scheduled"
-      );
-
-      const nextStopEstimatedArrival =
-        nextStop?.realTimeInfo?.estimatedArrivalTime;
-
       return [
         ...prev.filter((x) => x.tripId !== info.tripId),
         {
@@ -52,9 +45,11 @@ const MapRoute = () => {
           lng: info.currentPosition.longitude,
           tripId: info.tripId,
           routeName: info.routeName,
-          nextStopName: nextStop?.description,
-          nextStopEstimated: nextStopEstimatedArrival
-            ? new Date(`1970-01-01T${nextStopEstimatedArrival}`)
+          nextStopName: info.nextStop?.description,
+          nextStopEstimated: info.nextStop?.realTimeInfo?.estimatedArrivalTime
+            ? new Date(
+                `1970-01-01T${info.nextStop.realTimeInfo.estimatedArrivalTime}`
+              )
             : undefined,
         },
       ];

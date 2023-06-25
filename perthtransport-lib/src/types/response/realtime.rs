@@ -9,8 +9,7 @@ pub struct RealTimeResponse {
     // TODO: datetime
     pub last_updated: String,
     pub start_time: String,
-
-    pub transit_stops: Vec<TransitStop>,
+    pub next_stop: Option<TransitStop>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -39,7 +38,7 @@ pub struct RealTimeInfo {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum TransitStopStatus {
-    Completed,
-    AtStation,
-    Scheduled,
+    Scheduled = 1,
+    AtStation = 2,
+    Completed = 3,
 }

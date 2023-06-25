@@ -1,7 +1,3 @@
-use core::panic;
-
-use anyhow::{bail, Context};
-
 use super::{
     response::{
         realtime::{GeoPosition, RealTimeInfo, RealTimeResponse, TransitStop, TransitStopStatus},
@@ -10,17 +6,25 @@ use super::{
     },
     transperth::{realtime::PTARealTimeResponse, route::PTARouteResponse, trip::PTATripResponse},
 };
+use anyhow::Context;
+use core::panic;
 
 impl TryFrom<PTARealTimeResponse> for RealTimeResponse {
     type Error = anyhow::Error;
 
     fn try_from(value: PTARealTimeResponse) -> Result<Self, Self::Error> {
-        let transit_stops = value
+        let next_stop = value
             .trip_stops
             .iter()
-            .map(|t| -> Result<TransitStop, anyhow::Error> {
-                Ok(TransitStop {
-                    position: GeoPosition::try_from_str(&t.transit_stop.position)?,
+            .find(|x| {
+                x.real_time_info
+                    .as_ref()
+                    .map(|rti| rti.real_time_trip_status)
+                    .is_some_and(|status| status == TransitStopStatus::Scheduled as i64)
+            })
+            .and_then(|t| -> Option<TransitStop> {
+                Some(TransitStop {
+                    position: GeoPosition::try_from_str(&t.transit_stop.position).ok()?,
                     description: t.transit_stop.description.clone(),
                     real_time_info: t.real_time_info.as_ref().map(|rti| RealTimeInfo {
                         trip_status: rti.real_time_trip_status.into(),
@@ -33,16 +37,7 @@ impl TryFrom<PTARealTimeResponse> for RealTimeResponse {
                         estimated_departure_time: rti.estimated_departure_time.clone(),
                     }),
                 })
-            })
-            .collect::<Vec<_>>();
-
-        if transit_stops.iter().any(|t| t.is_err()) {
-            let errored = transit_stops.iter().filter(|t| t.is_err());
-            for error in errored {
-                tracing::info!("transit stop in error: {:#?}", error);
-            }
-            bail!("transit stop mapping error")
-        }
+            });
 
         Ok(RealTimeResponse {
             route_name: value.summary.route_name,
@@ -52,10 +47,7 @@ impl TryFrom<PTARealTimeResponse> for RealTimeResponse {
             )?,
             last_updated: value.summary.real_time_info.last_updated,
             start_time: value.summary.trip_start_time,
-            transit_stops: transit_stops
-                .into_iter()
-                .filter_map(|t| t.ok())
-                .collect::<Vec<_>>(),
+            next_stop,
         })
     }
 }
