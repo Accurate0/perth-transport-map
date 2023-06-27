@@ -3,7 +3,6 @@ use reqwest_tracing::{default_on_request_end, reqwest_otel_span, ReqwestOtelSpan
 use task_local_extensions::Extensions;
 use tokio::time::Instant;
 use tracing::Span;
-use tracing_subscriber::fmt::format::FmtSpan;
 use tracing_subscriber::EnvFilter;
 
 #[cfg(not(debug_assertions))]
@@ -11,7 +10,6 @@ pub fn init_logger() {
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .with_max_level(tracing::Level::INFO)
-        .with_span_events(FmtSpan::ENTER)
         .json()
         .with_thread_ids(true)
         .with_ansi(false)
@@ -23,7 +21,6 @@ pub fn init_logger() {
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .with_max_level(tracing::Level::INFO)
-        .with_span_events(FmtSpan::EXIT)
         .with_thread_ids(true)
         .init()
 }
