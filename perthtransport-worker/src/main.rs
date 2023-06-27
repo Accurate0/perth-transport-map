@@ -3,6 +3,7 @@ use futures_util::StreamExt;
 use http::header::{ACCEPT, ACCEPT_ENCODING, CONTENT_TYPE, HOST, USER_AGENT};
 use perthtransport::{
     constants::{PUBSUB_CHANNEL_GENERAL_IN, PUBSUB_CHANNEL_WORKER_HEALTH_IN},
+    queue::MessageBus,
     types::message::WorkerMessage,
 };
 use reqwest::header::HeaderMap;
@@ -23,10 +24,9 @@ async fn main() -> Result<(), anyhow::Error> {
     let redis = redis::Client::open(config.redis_connection_string.clone())?;
 
     let redis_multiplexed = Arc::new(RwLock::new(redis.get_multiplexed_async_connection().await?));
-    let mut redis_pubsub = redis.get_async_connection().await?.into_pubsub();
-    redis_pubsub.subscribe(PUBSUB_CHANNEL_GENERAL_IN).await?;
-    redis_pubsub
-        .subscribe(PUBSUB_CHANNEL_WORKER_HEALTH_IN)
+    let message_bus = MessageBus::new(redis.clone()).await?;
+    let mut pubsub = message_bus
+        .subscribe(&[PUBSUB_CHANNEL_GENERAL_IN, PUBSUB_CHANNEL_WORKER_HEALTH_IN])
         .await?;
 
     let mut default_headers = HeaderMap::new();
@@ -96,7 +96,7 @@ async fn main() -> Result<(), anyhow::Error> {
         }
     }));
 
-    loop {
+    while let Some(message) = pubsub.on_message().next().await {
         let http_client = Arc::clone(&http_client);
         let redis_multiplexed = Arc::clone(&redis_multiplexed);
         let task_manager = Arc::clone(&task_manager);
@@ -105,39 +105,37 @@ async fn main() -> Result<(), anyhow::Error> {
         let active_trains_handle = Arc::clone(&active_trains_handle);
         let worker_tx = worker_tx.clone();
         let config = Arc::clone(&config);
-        let message = redis_pubsub.on_message().next().await;
 
-        if let Some(message) = message {
-            let channel_name = message.get_channel_name();
-            // health check, write back on out channel
-            let span = tracing::info_span!("health_check");
-            if channel_name == PUBSUB_CHANNEL_WORKER_HEALTH_IN {
-                tokio::spawn(
-                    handle_healthcheck(
-                        worker_out_handle,
-                        task_manager_out_handle,
-                        active_trains_handle,
-                        redis_multiplexed,
-                        task_manager,
-                    )
-                    .instrument(span),
-                );
-            } else {
-                tokio::spawn(async {
-                    if let Err(e) = tasks::handle_message(
-                        http_client,
-                        worker_tx,
-                        redis_multiplexed,
-                        task_manager,
-                        message,
-                        config,
-                    )
-                    .await
-                    {
-                        tracing::error!("error handling message task: {}", e)
-                    }
-                });
-            }
+        let channel_name = message.get_channel_name();
+        let span = tracing::info_span!("health_check");
+        if channel_name == PUBSUB_CHANNEL_WORKER_HEALTH_IN {
+            tokio::spawn(
+                handle_healthcheck(
+                    worker_out_handle,
+                    task_manager_out_handle,
+                    active_trains_handle,
+                    redis_multiplexed,
+                    task_manager,
+                )
+                .instrument(span),
+            );
+        } else {
+            tokio::spawn(async {
+                if let Err(e) = tasks::handle_message(
+                    http_client,
+                    worker_tx,
+                    redis_multiplexed,
+                    task_manager,
+                    message,
+                    config,
+                )
+                .await
+                {
+                    tracing::error!("error handling message task: {}", e)
+                }
+            });
         }
     }
+
+    Ok(())
 }

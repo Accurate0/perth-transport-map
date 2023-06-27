@@ -1,9 +1,10 @@
 use axum::response::{IntoResponse, Response};
 use http::StatusCode;
+use perthtransport::queue::MessageBus;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub redis: redis::Client,
+    pub message_bus: MessageBus,
 }
 
 // error type that converts any error into service unavailble

@@ -12,11 +12,10 @@ use futures_util::{
 };
 use perthtransport::{
     constants::{PUBSUB_CHANNEL_GENERAL_IN, PUBSUB_CHANNEL_OUT_PREFIX},
+    queue::MessageBus,
     types::message::{PubSubAction, PubSubMessage, WebSocketMessage},
 };
-use redis::{aio::MultiplexedConnection, AsyncCommands};
-use std::{net::SocketAddr, sync::Arc};
-use tokio::sync::RwLock;
+use std::net::SocketAddr;
 use tracing::{Instrument, Level};
 
 pub async fn handler(
@@ -65,40 +64,37 @@ async fn handle_outgoing(
     state: State<AppState>,
     socket_id: String,
 ) -> Result<(), anyhow::Error> {
-    let mut redis = state.redis.get_async_connection().await?.into_pubsub();
     let channel = format!("{}_{}", PUBSUB_CHANNEL_OUT_PREFIX, socket_id);
-    redis.subscribe(channel.clone()).await?;
+    let mut pubsub = state.message_bus.subscribe(&[&channel]).await?;
 
     tracing::info!("subscribed: {}", channel);
 
-    loop {
-        let msg = redis.on_message().next().await;
-        if let Some(msg) = msg {
-            let payload = msg.get_payload()?;
-            tracing::info!("message recieved");
-            let _ = sender.send(Message::Text(payload)).await;
-        }
+    while let Some(msg) = pubsub.on_message().next().await {
+        let payload = msg.get_payload()?;
+        tracing::info!("message recieved");
+        let _ = sender.send(Message::Text(payload)).await;
     }
+
+    Ok(())
 }
 
 async fn handle_valid_message(
     socket_id: String,
     who: SocketAddr,
-    redis: Arc<RwLock<MultiplexedConnection>>,
+    message_bus: MessageBus,
     m: String,
 ) -> Result<(), anyhow::Error> {
-    let mut redis = redis.write().await;
     let message_result = serde_json::from_str::<WebSocketMessage>(&m);
     if let Ok(websocket_message) = message_result {
-        redis
+        message_bus
             .publish(
                 PUBSUB_CHANNEL_GENERAL_IN,
-                serde_json::to_string(&PubSubMessage {
+                PubSubMessage {
                     // TODO: other message types
                     action: PubSubAction::TripAdd,
                     socket_id: socket_id.clone(),
                     trip_id: Some(websocket_message.trip_id),
-                })?,
+                },
             )
             .await?;
         tracing::info!("PubSubAction::TripAdd: message sent");
@@ -120,53 +116,47 @@ async fn handle_incoming(
     state: State<AppState>,
     socket_id: String,
 ) -> Result<(), anyhow::Error> {
-    let redis = Arc::new(RwLock::new(
-        state.redis.get_multiplexed_async_connection().await?,
-    ));
-    {
-        let mut redis = redis.write().await;
-        redis
-            .publish(
-                PUBSUB_CHANNEL_GENERAL_IN,
-                serde_json::to_string(&PubSubMessage {
-                    action: PubSubAction::Hello,
-                    socket_id: socket_id.clone(),
-                    trip_id: None,
-                })?,
-            )
-            .await?;
-        tracing::info!("PubSubAction::Hello: message sent");
-    }
+    state
+        .message_bus
+        .publish(
+            PUBSUB_CHANNEL_GENERAL_IN,
+            PubSubMessage {
+                action: PubSubAction::Hello,
+                socket_id: socket_id.clone(),
+                trip_id: None,
+            },
+        )
+        .await?;
+    tracing::info!("PubSubAction::Hello: message sent");
 
-    loop {
-        if let Some(message) = receiver.next().await {
-            match message {
-                Ok(m) => match m {
-                    Message::Text(m) => {
-                        handle_valid_message(socket_id.clone(), who, Arc::clone(&redis), m).await?;
-                    }
-                    Message::Close(_) => {
-                        let mut redis = redis.write().await;
-                        redis
-                            .publish(
-                                PUBSUB_CHANNEL_GENERAL_IN,
-                                serde_json::to_string(&PubSubMessage {
-                                    action: PubSubAction::Bye,
-                                    socket_id: socket_id.clone(),
-                                    trip_id: None,
-                                })?,
-                            )
-                            .await?;
-                    }
-                    // https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#pings_and_pongs_the_heartbeat_of_websockets
-                    // You might also get a pong without ever sending a ping; ignore this if it happens.
-                    e => tracing::info!("client: {} sent unhandled event {:#?}", who, e),
-                },
-                Err(e) => tracing::error!("client: {} has error {}", who, e),
-            }
-        } else {
-            tracing::info!("client: {} has disconnected", who);
-            break Ok(());
+    while let Some(message) = receiver.next().await {
+        match message {
+            Ok(m) => match m {
+                Message::Text(m) => {
+                    handle_valid_message(socket_id.clone(), who, state.message_bus.clone(), m)
+                        .await?;
+                }
+                Message::Close(_) => {
+                    state
+                        .message_bus
+                        .publish(
+                            PUBSUB_CHANNEL_GENERAL_IN,
+                            PubSubMessage {
+                                action: PubSubAction::Bye,
+                                socket_id: socket_id.clone(),
+                                trip_id: None,
+                            },
+                        )
+                        .await?;
+                }
+                // https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#pings_and_pongs_the_heartbeat_of_websockets
+                // You might also get a pong without ever sending a ping; ignore this if it happens.
+                e => tracing::info!("client: {} sent unhandled event {:#?}", who, e),
+            },
+            Err(e) => tracing::error!("client: {} has error {}", who, e),
         }
     }
+
+    tracing::info!("client: {} has disconnected", who);
+    Ok(())
 }

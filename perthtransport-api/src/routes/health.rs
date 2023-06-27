@@ -7,17 +7,18 @@ use perthtransport::{
     constants::{PUBSUB_CHANNEL_WORKER_HEALTH_IN, PUBSUB_CHANNEL_WORKER_HEALTH_OUT},
     types::health::WorkerHealthStatus,
 };
-use redis::AsyncCommands;
 use std::time::Duration;
 
 pub async fn health_check(State(state): State<AppState>) -> Result<StatusCode, ServiceUnavailable> {
-    let mut pubsub = state.redis.get_async_connection().await?.into_pubsub();
-    let mut connection = state.redis.get_async_connection().await?;
-
-    // publish a guid to send back on
+    // TODO: publish a guid to send back on
     // individual healthcheck without conflict
-    pubsub.subscribe(PUBSUB_CHANNEL_WORKER_HEALTH_OUT).await?;
-    connection
+    let mut pubsub = state
+        .message_bus
+        .subscribe(&[PUBSUB_CHANNEL_WORKER_HEALTH_OUT])
+        .await?;
+
+    state
+        .message_bus
         .publish(PUBSUB_CHANNEL_WORKER_HEALTH_IN, "hey")
         .await?;
 

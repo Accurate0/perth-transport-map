@@ -10,6 +10,7 @@ use axum::{
     Extension, Router,
 };
 use http::Method;
+use perthtransport::queue::MessageBus;
 use reqwest::header::ACCEPT;
 use reqwest_tracing::TracingMiddleware;
 use std::{net::SocketAddr, sync::Arc};
@@ -32,7 +33,8 @@ async fn main() -> Result<(), anyhow::Error> {
     let config = perthtransport::config::get_application_config()?;
 
     let redis = redis::Client::open(config.redis_connection_string.clone())?;
-    let state = AppState { redis };
+    let message_bus = MessageBus::new(redis.clone()).await?;
+    let state = AppState { message_bus };
 
     let mut default_headers = HeaderMap::new();
     default_headers.append(ACCEPT_ENCODING, "gzip".parse()?);
