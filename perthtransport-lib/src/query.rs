@@ -11,7 +11,6 @@ use chrono::{DateTime, Days, Timelike, Utc};
 use http::header::HOST;
 use reqwest_middleware::ClientWithMiddleware;
 use std::{sync::Arc, time::SystemTime};
-use tokio::time::Instant;
 
 // TODO: cache this query
 // using cached package probs, i'm lazy
@@ -20,7 +19,6 @@ pub async fn get_live_trips_for(
     config: &ApplicationConfig,
     http_client: Arc<ClientWithMiddleware>,
 ) -> Result<LiveTripResponse, anyhow::Error> {
-    let start = Instant::now();
     let now = SystemTime::now();
     let now: DateTime<Utc> = now.into();
     let now_in_perth = now.with_timezone(&chrono_tz::Australia::Perth);
@@ -45,12 +43,6 @@ pub async fn get_live_trips_for(
         ])
         .send()
         .await?;
-
-    tracing::info!(
-        "timetable request completed with status: {} in {} ms",
-        response.status(),
-        start.elapsed().as_millis()
-    );
 
     let timetable_response = response.json::<PTATimetableResponse>().await?;
     let mut trip_ids: Vec<String> = timetable_response
@@ -83,12 +75,6 @@ pub async fn get_live_trips_for(
             .send()
             .await?;
 
-        tracing::info!(
-            "timetable request completed with status: {} in {} ms",
-            response.status(),
-            start.elapsed().as_millis()
-        );
-
         let timetable_response = response.json::<PTATimetableResponse>().await?;
         trip_ids.append(
             &mut timetable_response
@@ -99,7 +85,6 @@ pub async fn get_live_trips_for(
         );
     }
 
-    let start = Instant::now();
     let response = http_client
         .get(TRANSPERTH_TRIP_LOOKUP)
         .header(
@@ -114,12 +99,6 @@ pub async fn get_live_trips_for(
         .query(&[("TripIDs", trip_ids.join(","))])
         .send()
         .await?;
-
-    tracing::info!(
-        "trip request completed with status: {} in {} ms",
-        response.status(),
-        start.elapsed().as_millis()
-    );
 
     let trip_response = response.json::<PTATripResponse>().await?;
     let live_trip_response = LiveTripResponse::from(trip_response);

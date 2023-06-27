@@ -11,7 +11,6 @@ use perthtransport::{
 use reqwest::header::HOST;
 use reqwest_middleware::ClientWithMiddleware;
 use std::{sync::Arc, time::SystemTime};
-use tokio::time::Instant;
 
 pub type PTASchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 pub struct QueryRoot;
@@ -32,7 +31,6 @@ impl QueryRoot {
             .expect("get millis error")
             .as_millis();
 
-        let start = Instant::now();
         let response = http_client
             .get(TRANSPERTH_ROUTE_ENDPOINT)
             .header(HOST, "au-journeyplanner.silverrail.io".parse::<String>()?)
@@ -44,12 +42,6 @@ impl QueryRoot {
             ])
             .send()
             .await?;
-
-        tracing::info!(
-            "route request completed with status: {} in {} ms",
-            response.status(),
-            start.elapsed().as_millis()
-        );
 
         let response = response.json::<PTARouteResponse>().await?;
 

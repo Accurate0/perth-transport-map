@@ -3,6 +3,7 @@ use futures_util::StreamExt;
 use http::header::{ACCEPT, ACCEPT_ENCODING, CONTENT_TYPE, HOST, USER_AGENT};
 use perthtransport::{
     constants::{PUBSUB_CHANNEL_GENERAL_IN, PUBSUB_CHANNEL_WORKER_HEALTH_IN},
+    log::TimeTrace,
     queue::MessageBus,
     types::message::WorkerMessage,
 };
@@ -42,7 +43,7 @@ async fn main() -> Result<(), anyhow::Error> {
                 .default_headers(default_headers)
                 .build()?,
         )
-        .with(TracingMiddleware::default())
+        .with(TracingMiddleware::<TimeTrace>::new())
         .build(),
     );
 
