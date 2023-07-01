@@ -11,11 +11,13 @@ services:
     container_name: perthtransport-api
     environment:
       - PTA_REDIS_CONNECTION_STRING=redis://redis-connection
+      - PTA_WORKER_API_BASE=http://worker:8000/v1
       - RUST_LOG
     depends_on:
       - redis
     links:
       - redis:redis-connection
+      - perthtransport-worker:worker
     ports:
       - 8000:8000
 

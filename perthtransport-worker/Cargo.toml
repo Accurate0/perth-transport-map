@@ -36,3 +36,11 @@ tracing-subscriber = "0.3.16"
 chrono-tz = "0.8.2"
 flume = { version = "0.10.14", features = ["async"] }
 futures = "0.3.28"
+axum = { version = "0.6.18", features = [
+    "headers",
+    "tracing",
+    "tokio",
+    "json",
+] }
+tower-http = { version = "0.4.0", features = ["trace", "cors"] }
+tower = { version = "0.4.13", features = ["limit"] }

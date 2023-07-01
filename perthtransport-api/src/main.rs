@@ -34,7 +34,6 @@ async fn main() -> Result<(), anyhow::Error> {
 
     let redis = redis::Client::open(config.redis_connection_string.clone())?;
     let message_bus = MessageBus::new(redis.clone()).await?;
-    let state = AppState { message_bus };
 
     let mut default_headers = HeaderMap::new();
     default_headers.append(ACCEPT_ENCODING, "gzip".parse()?);
@@ -52,6 +51,12 @@ async fn main() -> Result<(), anyhow::Error> {
         .build(),
     );
 
+    let state = AppState {
+        message_bus,
+        http_client: Arc::clone(&http_client),
+        config: config.clone(),
+    };
+
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
         .data(http_client)
         .data(config)
@@ -66,6 +71,10 @@ async fn main() -> Result<(), anyhow::Error> {
         .route("/ws", get(routes::websocket::handler))
         // maccas api is /health/status but this makes more sense
         .route("/status/health", get(health_check))
+        .with_state(state);
+
+    let app = Router::new()
+        .nest("/v1", routes)
         .layer(
             CorsLayer::new()
                 .allow_origin(AllowOrigin::list([
@@ -79,7 +88,7 @@ async fn main() -> Result<(), anyhow::Error> {
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(|request: &Request<Body>| {
-                    tracing::info_span!("http-request", uri = request.uri().to_string())
+                    tracing::info_span!("api", uri = request.uri().to_string())
                 })
                 .on_request(DefaultOnRequest::new().level(Level::INFO))
                 .on_response(
@@ -88,10 +97,7 @@ async fn main() -> Result<(), anyhow::Error> {
                         .latency_unit(LatencyUnit::Millis),
                 ),
         )
-        .layer(GlobalConcurrencyLimitLayer::new(2048))
-        .with_state(state);
-
-    let app = Router::new().nest("/v1", routes);
+        .layer(GlobalConcurrencyLimitLayer::new(2048));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
     tracing::info!("server starting on {}", addr);

@@ -1287,6 +1287,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-graphql",
+ "axum",
  "chrono",
  "chrono-tz",
  "config",
@@ -1339,6 +1340,7 @@ name = "perthtransport-worker"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "axum",
  "base64 0.21.2",
  "chrono",
  "chrono-tz",
@@ -1358,6 +1360,8 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
+ "tower",
+ "tower-http",
  "tracing",
  "tracing-subscriber",
 ]
