@@ -1,6 +1,10 @@
 use crate::task_manager::TaskManager;
 use futures_util::future::join_all;
-use perthtransport::{constants::ACTIVE_TRAINS_KEY, query, types::config::ApplicationConfig};
+use perthtransport::{
+    constants::{ACTIVE_TRAINS_KEY, ACTIVE_TRAIN_THREAD_SLEEP},
+    query,
+    types::config::ApplicationConfig,
+};
 use redis::AsyncCommands;
 use std::{sync::Arc, time::Duration};
 
@@ -38,15 +42,14 @@ pub async fn handle_active_trains(
         .flat_map(|x| x.live_trips.clone())
         .collect();
 
+        tracing::info!("there are {} currently active trains", live_trip_ids.len());
         // set in cache
         redis_multiplexed
             .set(ACTIVE_TRAINS_KEY, serde_json::to_string(&live_trip_ids)?)
             .await?;
 
         // TODO: update active websocket sessions too
-
-        let sleep_duration = 600;
-        tracing::info!("sleeping for {} seconds", sleep_duration);
-        tokio::time::sleep(Duration::from_secs(sleep_duration)).await;
+        tracing::info!("sleeping for {} seconds", ACTIVE_TRAIN_THREAD_SLEEP);
+        tokio::time::sleep(Duration::from_secs(ACTIVE_TRAIN_THREAD_SLEEP)).await;
     }
 }

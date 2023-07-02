@@ -4,6 +4,7 @@ pub const PUBSUB_CHANNEL_OUT_PREFIX: &str = "pta_out";
 pub const CACHE_KEY_PREFIX: &str = "pta_trip";
 pub const CACHE_TTL: usize = 29;
 pub const TRIP_THREAD_SLEEP: u64 = 30;
+pub const ACTIVE_TRAIN_THREAD_SLEEP: u64 = 600;
 pub const DO_NOT_TRACK_KEY_PREFIX: &str = "pta_do_not_track";
 pub const ACTIVE_TRAINS_KEY: &str = "pta_active_trains";
 pub const PUBSUB_CHANNEL_WORKER_TASK_OUT: &str = "pta_worker_out";
