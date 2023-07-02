@@ -4,7 +4,7 @@ use chrono::{DateTime, Days, Timelike, Utc};
 use flume::Sender;
 use http::header::AUTHORIZATION;
 use perthtransport::{
-    constants::{TRANSPERTH_EARLY_HOURS, TRANSPERTH_REAL_TIME_API},
+    constants::{TRANSPERTH_EARLY_HOURS, TRANSPERTH_REAL_TIME_API, TRIP_THREAD_SLEEP},
     types::{
         config::ApplicationConfig,
         message::{MessageContents, WorkerMessage},
@@ -119,15 +119,17 @@ pub async fn handle_trip(
             && pta_realtime_converted.current_position.longitude != 0f64;
 
         worker_tx
-            .send_async(WorkerMessage::HasMessage(Box::new(MessageContents {
-                response: pta_realtime_converted,
-                trip_id: trip_id.clone(),
-                publish,
-            })))
+            .send_async(WorkerMessage::HasMessage(
+                MessageContents {
+                    response: pta_realtime_converted,
+                    trip_id: trip_id.clone(),
+                    publish,
+                }
+                .into(),
+            ))
             .await?;
 
-        let sleep_duration = 30;
-        tracing::info!("task sleeping for {}", sleep_duration);
-        tokio::time::sleep(Duration::from_secs(sleep_duration)).await;
+        tracing::info!("task sleeping for {}", TRIP_THREAD_SLEEP);
+        tokio::time::sleep(Duration::from_secs(TRIP_THREAD_SLEEP)).await;
     }
 }

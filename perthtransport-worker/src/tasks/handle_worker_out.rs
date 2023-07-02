@@ -1,7 +1,7 @@
 use crate::task_manager::TaskManager;
 use flume::Receiver;
 use perthtransport::{
-    constants::{CACHE_KEY_PREFIX, DO_NOT_TRACK_KEY_PREFIX, PUBSUB_CHANNEL_OUT_PREFIX},
+    constants::{CACHE_KEY_PREFIX, CACHE_TTL, DO_NOT_TRACK_KEY_PREFIX, PUBSUB_CHANNEL_OUT_PREFIX},
     types::message::WorkerMessage,
 };
 use redis::AsyncCommands;
@@ -28,7 +28,7 @@ pub async fn handle_worker_out(
                     .set_ex(
                         format!("{}_{}", CACHE_KEY_PREFIX, trip_id),
                         &json_string,
-                        29,
+                        CACHE_TTL,
                     )
                     .await?;
 
