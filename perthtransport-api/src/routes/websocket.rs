@@ -21,10 +21,10 @@ use tracing::{Instrument, Level};
 pub async fn handler(
     ws: WebSocketUpgrade,
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
-    State(state): State<AppState>,
+    state: State<AppState>,
 ) -> impl IntoResponse {
     tracing::info!("client: {} has connected", addr);
-    ws.on_upgrade(move |socket| handle_socket(socket, addr, axum::extract::State(state)))
+    ws.on_upgrade(move |socket| handle_socket(socket, addr, state))
 }
 
 async fn handle_socket(socket: WebSocket, who: SocketAddr, state: State<AppState>) {
