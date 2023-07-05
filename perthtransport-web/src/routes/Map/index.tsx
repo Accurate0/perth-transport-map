@@ -93,7 +93,7 @@ const MapRoute = () => {
   return (
     <>
       <DarkModeToggle />
-      <HealthStatus isHealthy={isHealthy} />
+      {!isHealthy && <HealthStatus isHealthy={isHealthy} />}
       <GoogleMap
         options={mapOptions}
         zoom={zoomLevel}
