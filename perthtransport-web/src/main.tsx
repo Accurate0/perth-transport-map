@@ -16,7 +16,7 @@ const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <Navigate to="/map" />,
+    element: <Navigate replace to="/map" />,
   },
 ]);
 
