@@ -16,7 +16,7 @@ const HealthStatus = ({ isHealthy }: { isHealthy: boolean }) => {
       style={{
         position: "fixed",
         zIndex: 50,
-        bottom: "116px",
+        bottom: "114px",
         left: "18px",
         background: backgroundColour,
         maxHeight: "40px",

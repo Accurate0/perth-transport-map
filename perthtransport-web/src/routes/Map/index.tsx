@@ -93,9 +93,9 @@ const MapRoute = () => {
 
   return (
     <>
+      {!isHealthy && <HealthStatus isHealthy={isHealthy} />}
       <DarkModeToggle />
       <GithubLink />
-      {!isHealthy && <HealthStatus isHealthy={isHealthy} />}
       <GoogleMap
         options={mapOptions}
         zoom={zoomLevel}
