@@ -1,10 +1,10 @@
 import { Button } from "@mui/material";
 import useDarkMode from "../hooks/useDarkMode";
-import { DarkMode, LightMode } from "@mui/icons-material";
+import { GitHub } from "@mui/icons-material";
 import { useMemo } from "react";
 
-const DarkModeToggle = () => {
-  const { isDarkMode, toggleDarkMode } = useDarkMode();
+const GithubLink = () => {
+  const { isDarkMode } = useDarkMode();
 
   const colour = useMemo(() => (isDarkMode ? "#fff" : "#000"), [isDarkMode]);
   const backgroundColour = useMemo(
@@ -17,7 +17,7 @@ const DarkModeToggle = () => {
       style={{
         position: "fixed",
         zIndex: 50,
-        bottom: "66px",
+        bottom: "18px",
         left: "18px",
         background: backgroundColour,
         maxHeight: "40px",
@@ -25,16 +25,16 @@ const DarkModeToggle = () => {
         maxWidth: "40px",
         minWidth: "40px",
       }}
-      onClick={toggleDarkMode}
+      href="https://github.com/Accurate0/perth-transport-map"
       disableRipple
     >
       {isDarkMode ? (
-        <DarkMode htmlColor={colour} />
+        <GitHub htmlColor={colour} />
       ) : (
-        <LightMode htmlColor={colour} />
+        <GitHub htmlColor={colour} />
       )}
     </Button>
   );
 };
 
-export default DarkModeToggle;
+export default GithubLink;

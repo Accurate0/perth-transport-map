@@ -16,6 +16,7 @@ import useHealthCheck from "../../hooks/useHealthCheck";
 import HealthStatus from "../../components/HealthStatus";
 import { RouteName, useGetRouteColour } from "../../hooks/useGetRouteColour";
 import { faSubway } from "@fortawesome/free-solid-svg-icons";
+import GithubLink from "../../components/GithubLink";
 
 interface RealTime {
   lat: number;
@@ -93,6 +94,7 @@ const MapRoute = () => {
   return (
     <>
       <DarkModeToggle />
+      <GithubLink />
       {!isHealthy && <HealthStatus isHealthy={isHealthy} />}
       <GoogleMap
         options={mapOptions}
