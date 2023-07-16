@@ -29,11 +29,7 @@ const GithubLink = () => {
       target="_blank"
       disableRipple
     >
-      {isDarkMode ? (
-        <GitHub htmlColor={colour} />
-      ) : (
-        <GitHub htmlColor={colour} />
-      )}
+      <GitHub htmlColor={colour} />
     </Button>
   );
 };
