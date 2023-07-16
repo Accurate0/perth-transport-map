@@ -26,6 +26,7 @@ const GithubLink = () => {
         minWidth: "40px",
       }}
       href="https://github.com/Accurate0/perth-transport-map"
+      target="_blank"
       disableRipple
     >
       {isDarkMode ? (
