@@ -109,14 +109,22 @@ impl TaskManager {
     }
 
     pub async fn get_all_task_subscribers(&self, task_id: String) -> Option<HashSet<String>> {
-        let task_subscribers: tokio::sync::RwLockReadGuard<HashMap<String, HashSet<String>>> =
-            self.task_subscribers.read().await;
+        let task_subscribers = self.task_subscribers.read().await;
         task_subscribers.get(&task_id).cloned()
     }
 
     pub async fn is_healthy(&self) -> bool {
         // TODO: determine what is health for this
         true
+    }
+
+    pub async fn get_all_socket_ids(&self) -> Vec<String> {
+        self.websocket_subscriptions
+            .read()
+            .await
+            .keys()
+            .map(|x| x.to_owned())
+            .collect::<Vec<String>>()
     }
 
     pub async fn clean_up_dead_tasks(&self) -> Result<(), anyhow::Error> {

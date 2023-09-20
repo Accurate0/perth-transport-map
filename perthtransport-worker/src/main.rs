@@ -89,6 +89,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let span = tracing::span!(Level::INFO, "active_trains");
     let active_trains_http_client = Arc::clone(&http_client);
     let active_trains_config = Arc::clone(&config);
+    let worker_tx_cloned = worker_tx.clone();
 
     let active_trains_handle = Arc::new(tokio::spawn(async move {
         if let Err(e) = tasks::handle_active_trains(
@@ -96,6 +97,7 @@ async fn main() -> Result<(), anyhow::Error> {
             active_trains_config,
             active_trains_http_client,
             active_trains_redis_connection,
+            worker_tx_cloned,
         )
         .instrument(span)
         .await
