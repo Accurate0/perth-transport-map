@@ -19,8 +19,7 @@ pub async fn handle_active_trains(
 ) -> Result<(), anyhow::Error> {
     loop {
         tracing::info!("caching currently active trains");
-        let trains = vec![
-            // Airport Line
+        let trains = [
             "PerthRestricted:RTG_16",
             // Midland Line
             "PerthRestricted:RTG_15",
