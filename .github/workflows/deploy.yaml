@@ -60,7 +60,6 @@ jobs:
     needs:
       - build-api
       - build-worker
-      - build-web
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -76,8 +75,6 @@ jobs:
 
   deploy-web:
     needs:
-      - build-api
-      - build-worker
       - build-web
     runs-on: ubuntu-latest
     steps:
