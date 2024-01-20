@@ -13,7 +13,7 @@ function animateMarkerTo(
   setPosition: (location: google.maps.LatLngLiteral) => void
 ) {
   const options = {
-    duration: 2500,
+    duration: 15000,
     easing: function (t: number, b: number, c: number, d: number) {
       // jquery animation: swing (easeOutQuad)
       return -c * (t /= d) * (t - 2) + b;
@@ -23,7 +23,7 @@ function animateMarkerTo(
   // save current position. prefixed to avoid name collisions. separate for lat/lng to avoid calling lat()/lng() in every frame
   marker.__startPosition_lat = marker.getPosition()?.lat() as number;
   marker.__startPosition_lng = marker.getPosition()?.lng() as number;
-  let newPosition_lat = newPosition.lat();
+  const newPosition_lat = newPosition.lat();
   let newPosition_lng = newPosition.lng();
 
   // crossing the 180° meridian and going the long way around the earth?
