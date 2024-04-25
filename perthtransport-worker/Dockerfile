@@ -1,4 +1,4 @@
-FROM arm64v8/rust:1.70.0-alpine AS chef
+FROM arm64v8/rust:1.75.0-alpine AS chef
 
 RUN apk add --no-cache musl-dev
 RUN rustup target add aarch64-unknown-linux-musl
