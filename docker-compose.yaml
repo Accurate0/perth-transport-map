@@ -5,9 +5,6 @@ services:
       - .env
     build:
       dockerfile: ./perthtransport-api/Dockerfile.amd64
-      args:
-        BUILD_MODE: dev
-        BUILD_DIRECTORY: debug
     container_name: perthtransport-api
     environment:
       - PTA_REDIS_CONNECTION_STRING=redis://redis-connection
@@ -28,9 +25,6 @@ services:
       - .env
     build:
       dockerfile: ./perthtransport-worker/Dockerfile.amd64
-      args:
-        BUILD_MODE: dev
-        BUILD_DIRECTORY: debug
     container_name: perthtransport-worker
     environment:
       - PTA_REALTIME_API_KEY
