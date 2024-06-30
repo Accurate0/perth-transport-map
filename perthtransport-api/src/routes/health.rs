@@ -9,12 +9,14 @@ pub async fn health_check(State(state): State<AppState>) -> Result<StatusCode, S
     let response = state
         .http_client
         .get(health_endpoint)
-        .timeout(Duration::from_secs(1))
+        .timeout(Duration::from_secs(3))
         .send()
         .await?
         .error_for_status()?
         .json::<WorkerHealthStatus>()
         .await?;
+
+    tracing::info!("response: {:?}", response);
 
     if response.active_trains_healthy
         && response.task_manager_healthy
