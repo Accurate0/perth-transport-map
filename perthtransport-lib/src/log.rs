@@ -10,7 +10,6 @@ pub fn init_logger() {
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .with_max_level(tracing::Level::INFO)
-        .json()
         .with_thread_ids(true)
         .with_ansi(false)
         .init()
