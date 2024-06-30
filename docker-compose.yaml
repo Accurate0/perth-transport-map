@@ -7,12 +7,15 @@ services:
       dockerfile: ./perthtransport-api/Dockerfile
     container_name: perthtransport-api
     environment:
-      - PTA_REDIS_CONNECTION_STRING
+      - PTA_REDIS_CONNECTION_STRING=redis://redis-connection
       - PTA_WORKER_API_BASE=http://worker:8000/v1
       - PTA_REALTIME_API_KEY
       - PTA_REFERENCE_DATA_API_KEY
       - RUST_LOG
+    depends_on:
+      - redis
     links:
+      - redis:redis-connection
       - perthtransport-worker:worker
     ports:
       - 8000:8000
@@ -26,5 +29,13 @@ services:
     environment:
       - PTA_REALTIME_API_KEY
       - PTA_REFERENCE_DATA_API_KEY
-      - PTA_REDIS_CONNECTION_STRING
+      - PTA_REDIS_CONNECTION_STRING=redis://redis-connection
       - RUST_LOG
+    depends_on:
+      - redis
+    links:
+      - redis:redis-connection
+
+  redis:
+    image: redis:alpine
+    container_name: redis
