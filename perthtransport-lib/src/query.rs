@@ -31,7 +31,6 @@ pub async fn get_live_trips_for(
 
     let response = http_client
         .get(TRANSPERTH_TIMETABLE_ENDPOINT)
-        .header(HOST, "au-journeyplanner.silverrail.io".parse::<String>()?)
         .query(&[
             ("ApiKey", config.reference_data_api_key.as_str()),
             ("format", "json"),
@@ -62,7 +61,6 @@ pub async fn get_live_trips_for(
 
         let response = http_client
             .get(TRANSPERTH_TIMETABLE_ENDPOINT)
-            .header(HOST, "au-journeyplanner.silverrail.io".parse::<String>()?)
             .query(&[
                 ("ApiKey", config.reference_data_api_key.as_str()),
                 ("format", "json"),

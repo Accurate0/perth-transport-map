@@ -8,7 +8,6 @@ use perthtransport::{
         transperth::route::PTARouteResponse,
     },
 };
-use reqwest::header::HOST;
 use reqwest_middleware::ClientWithMiddleware;
 use std::{sync::Arc, time::SystemTime};
 
@@ -33,7 +32,6 @@ impl QueryRoot {
 
         let response = http_client
             .get(TRANSPERTH_ROUTE_ENDPOINT)
-            .header(HOST, "au-journeyplanner.silverrail.io".parse::<String>()?)
             .query(&[
                 ("ApiKey", config.reference_data_api_key.as_str()),
                 ("format", "json"),

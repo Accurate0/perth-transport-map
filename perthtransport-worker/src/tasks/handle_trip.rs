@@ -49,7 +49,8 @@ pub async fn handle_trip(
                 generate_realtime_auth_header(&config.realtime_api_key).await?,
             )
             .send()
-            .await?;
+            .await?
+            .error_for_status()?;
 
         tracing::info!(
             "realtime request completed with status: {} in {} ms",
