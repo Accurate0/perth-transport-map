@@ -41,7 +41,8 @@ impl QueryRoot {
                 ("_", &now.to_string()),
             ])
             .send()
-            .await?;
+            .await?
+            .error_for_status()?;
 
         let response = response.json::<PTARouteResponse>().await?;
 
