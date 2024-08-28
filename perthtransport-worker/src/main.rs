@@ -2,7 +2,7 @@ use crate::{routes::health_check, types::AppState};
 use axum::{body::Body, routing::get, Router};
 use futures_util::StreamExt;
 use http::{
-    header::{ACCEPT, ACCEPT_ENCODING, CONTENT_TYPE, HOST, USER_AGENT},
+    header::{ACCEPT, ACCEPT_ENCODING, CONTENT_TYPE, USER_AGENT},
     Request,
 };
 use perthtransport::{
