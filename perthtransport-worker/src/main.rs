@@ -41,7 +41,6 @@ async fn main() -> Result<(), anyhow::Error> {
     default_headers.append(ACCEPT_ENCODING, "gzip".parse()?);
     default_headers.append(CONTENT_TYPE, "application/json".parse()?);
     default_headers.append(ACCEPT, "application/json".parse()?);
-    default_headers.append(HOST, "realtime.transperth.info".parse()?);
     default_headers.append(USER_AGENT, "okhttp/4.9.2".parse()?);
 
     let http_client = Arc::new(
