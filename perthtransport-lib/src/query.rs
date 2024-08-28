@@ -41,7 +41,8 @@ pub async fn get_live_trips_for(
             ("_", &now.to_string()),
         ])
         .send()
-        .await?;
+        .await?
+        .error_for_status()?;
 
     let timetable_response = response.json::<PTATimetableResponse>().await?;
     let mut trip_ids: Vec<String> = timetable_response
@@ -71,7 +72,8 @@ pub async fn get_live_trips_for(
                 ("_", &now.to_string()),
             ])
             .send()
-            .await?;
+            .await?
+            .error_for_status()?;
 
         let timetable_response = response.json::<PTATimetableResponse>().await?;
         trip_ids.append(
@@ -85,10 +87,6 @@ pub async fn get_live_trips_for(
 
     let response = http_client
         .get(TRANSPERTH_TRIP_LOOKUP)
-        .header(
-            HOST,
-            "serviceinformation.transperth.info".parse::<String>()?,
-        )
         .query(&[
             ("OperatingDate", datetime.as_str()),
             ("format", "json"),
@@ -96,7 +94,8 @@ pub async fn get_live_trips_for(
         ])
         .query(&[("TripIDs", trip_ids.join(","))])
         .send()
-        .await?;
+        .await?
+        .error_for_status()?;
 
     let trip_response = response.json::<PTATripResponse>().await?;
     let live_trip_response = LiveTripResponse::from(trip_response);
