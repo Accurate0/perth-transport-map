@@ -8,7 +8,6 @@ use crate::{
 };
 use anyhow::Context;
 use chrono::{DateTime, Days, Timelike, Utc};
-use http::header::HOST;
 use reqwest_middleware::ClientWithMiddleware;
 use std::{sync::Arc, time::SystemTime};
 
