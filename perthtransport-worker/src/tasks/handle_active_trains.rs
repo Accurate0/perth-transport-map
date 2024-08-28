@@ -35,11 +35,18 @@ pub async fn handle_active_trains(
             "PerthRestricted:RTG_10",
         ];
 
-        let live_trip_ids: Vec<String> = join_all(trains.iter().map(|timetable_id| {
+        let live_trip_ids: Vec<String> = join_all(trains.into_iter().map(|timetable_id| {
             query::get_live_trips_for(timetable_id, &config, http_client.clone())
         }))
         .await
         .iter()
+        .map(|x| {
+            if x.is_err() {
+                tracing::error!("error in fetching active train: {x:?}")
+            }
+
+            x
+        })
         .filter_map(|x| x.as_ref().ok())
         .flat_map(|x| x.live_trips.clone())
         .collect();
