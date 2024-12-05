@@ -4,27 +4,27 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.71"
-chrono = "0.4.26"
-config = "0.13.3"
-log = "0.4.18"
-serde = "1.0.164"
-serde_json = "1.0.96"
-tokio = "1.28.2"
-tracing = "0.1.37"
-async-graphql = { version = "5.0.10", features = ["tracing"] }
-tracing-subscriber = { version = "0.3.17", features = ["env-filter", "json"] }
-reqwest = { version = "0.11.18", features = [
+anyhow = "1.0.94"
+chrono = "0.4.38"
+config = "0.14.1"
+log = "0.4.22"
+serde = "1.0.215"
+serde_json = "1.0.133"
+tokio = "1.42.0"
+tracing = "0.1.41"
+async-graphql = { version = "7.0.11", features = ["tracing"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json"] }
+reqwest = { version = "0.12.9", features = [
     "rustls-tls",
     "json",
     "gzip",
 ], default-features = false }
-reqwest-middleware = "0.2.2"
-chrono-tz = "0.8.2"
-http = "0.2.9"
-redis = { version = "0.23.0", features = ["aio", "connection-manager"] }
-reqwest-tracing = "0.4.5"
+reqwest-middleware = "0.4.0"
+chrono-tz = "0.10.0"
+http = "1.2.0"
+redis = { version = "0.27.6", features = ["aio", "connection-manager"] }
+reqwest-tracing = "0.5.4"
 task-local-extensions = "0.1.4"
-tracing-opentelemetry = "0.19.0"
-opentelemetry = "0.19.0"
-axum = { version = "0.6.18", features = ["headers", "tracing", "tokio"] }
+tracing-opentelemetry = "0.28.0"
+opentelemetry = "0.27.1"
+axum = { version = "0.7.9", features = ["tracing", "tokio"] }

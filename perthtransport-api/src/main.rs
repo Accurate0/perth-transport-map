@@ -14,6 +14,7 @@ use perthtransport::queue::MessageBus;
 use reqwest::header::ACCEPT;
 use reqwest_tracing::TracingMiddleware;
 use std::{net::SocketAddr, sync::Arc};
+use tokio::net::TcpListener;
 use tower::limit::GlobalConcurrencyLimitLayer;
 use tower_http::{
     cors::{AllowHeaders, AllowOrigin, CorsLayer},
@@ -100,10 +101,13 @@ async fn main() -> Result<(), anyhow::Error> {
         .layer(GlobalConcurrencyLimitLayer::new(2048));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
+    let listener = TcpListener::bind(addr).await?;
     tracing::info!("server starting on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
-        .await?;
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .await?;
 
     Ok(())
 }

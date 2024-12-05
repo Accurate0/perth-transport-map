@@ -46,11 +46,7 @@ impl MessageBus {
     }
 
     pub async fn subscribe(&self, channels: &[&str]) -> Result<redis::aio::PubSub, anyhow::Error> {
-        let mut pubsub = self
-            .redis_client
-            .get_async_connection()
-            .await?
-            .into_pubsub();
+        let mut pubsub = self.redis_client.get_async_pubsub().await?;
 
         for channel in channels {
             pubsub.subscribe(channel).await?

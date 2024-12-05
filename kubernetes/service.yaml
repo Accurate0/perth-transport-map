@@ -7,12 +7,15 @@ spec:
   selector:
     app: perth-transport-map
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-    - protocol: TCP
+    - name: web
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+    - name: worker
+      protocol: TCP
       port: 8001
       targetPort: 8001
-    - protocol: TCP
+    - name: api
+      protocol: TCP
       port: 8000
       targetPort: 8000

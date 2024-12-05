@@ -32,8 +32,7 @@ spec:
             - secretRef:
                 name: perth-transport-map-managed-secrets
           ports:
-            - containerPort: 8000
-              port: 8001
+            - containerPort: 8001
 
         - name: perth-transport-map-web
           image: ghcr.io/accurate0/perth-transport-map-web:latest
@@ -42,4 +41,4 @@ spec:
             - secretRef:
                 name: perth-transport-map-managed-secrets
           ports:
-            - containerPort: 80
+            - containerPort: 3000

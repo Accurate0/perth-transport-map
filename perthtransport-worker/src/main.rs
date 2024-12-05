@@ -11,9 +11,9 @@ use perthtransport::{
 };
 use reqwest::header::HeaderMap;
 use reqwest_tracing::TracingMiddleware;
-use std::{net::SocketAddr, sync::Arc};
+use std::{future::IntoFuture, net::SocketAddr, sync::Arc};
 use task_manager::TaskManager;
-use tokio::sync::RwLock;
+use tokio::{net::TcpListener, sync::RwLock};
 use tower::limit::GlobalConcurrencyLimitLayer;
 use tower_http::{
     trace::{DefaultOnRequest, DefaultOnResponse, TraceLayer},
@@ -132,9 +132,18 @@ async fn main() -> Result<(), anyhow::Error> {
         )
         .layer(GlobalConcurrencyLimitLayer::new(2048));
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8001));
     tracing::info!("server starting on {}", addr);
-    tokio::spawn(axum::Server::bind(&addr).serve(app.into_make_service()));
+
+    let listener = TcpListener::bind(addr).await?;
+    tracing::info!("server starting on {}", addr);
+    tokio::spawn(
+        axum::serve(
+            listener,
+            app.into_make_service_with_connect_info::<SocketAddr>(),
+        )
+        .into_future(),
+    );
 
     while let Some(message) = pubsub.on_message().next().await {
         let http_client = Arc::clone(&http_client);

@@ -54,13 +54,26 @@ jobs:
           cache-target: /usr/local/cargo/registry/
 
       - name: Docker build
+        if: ${{ matrix.apps == 'api' || matrix.apps == 'worker' }}
         uses: docker/build-push-action@v5
         with:
-          context: perthtransport-${{ matrix.apps }}
+          context: .
           push: true
           tags: ghcr.io/accurate0/perth-transport-map-${{ matrix.apps }}:latest,ghcr.io/accurate0/perth-transport-map-${{ matrix.apps }}:${{ github.sha }}
           build-args: |
-            BINARY_NAME=${{ matrix.apps }}
+            BINARY_NAME=perthtransport-${{ matrix.apps }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+
+      - name: Docker build
+        if: ${{ matrix.apps  == 'web' }}
+        uses: docker/build-push-action@v5
+        with:
+          context: perthtransport-${{ matrix.apps }}
+          secrets: |
+            VITE_MAPS_API_KEY=${{ secrets.VITE_MAPS_API_KEY }}
+          push: true
+          tags: ghcr.io/accurate0/perth-transport-map-${{ matrix.apps }}:latest,ghcr.io/accurate0/perth-transport-map-${{ matrix.apps }}:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
 
@@ -75,9 +88,13 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   deploy:
+    name: Deploy
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Tailscale
         uses: tailscale/github-action@v2
         with:
