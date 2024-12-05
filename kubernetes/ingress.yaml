@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: perth-transport-map
+  namespace: perth-transport-map
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: perthtransport.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: perth-transport-map-web
+                port:
+                  number: 80
+    - host: api.perthtransport.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: perth-transport-map-api
+                port:
+                  number: 8000
+  tls:
+    - secretName: perth-transport-map-tls
+      hosts:
+        - perthtransport.xyz
+    - secretName: api-perth-transport-map-tls
+      hosts:
+        - api.perthtransport.xyz

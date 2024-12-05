@@ -1,0 +1,23 @@
+name: Clean up old images
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    name: Delete old images
+
+    permissions:
+      packages: write
+
+    steps:
+      - uses: snok/container-retention-policy@v3.0.0
+        with:
+          account: user
+          token: ${{ secrets.GITHUB_TOKEN }}
+          image-names: "maccas-web maccas-dashboard maccas-migration maccas-api maccas-batch maccas-event"
+          image-tags: "!latest"
+          keep-n-most-recent: 3
+          cut-off: 3d

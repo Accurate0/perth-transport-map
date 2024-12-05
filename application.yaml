@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: perth-transport-map
+  namespace: argocd
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/Accurate0/perth-transport-map.git
+    path: kubernetes
+    directory:
+      include: "*.yaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: perth-transport-map
+operation:
+  initiatedBy:
+    username: github-actions
+  sync:
+    prune: true
+    syncStrategy:
+      hook: {}
