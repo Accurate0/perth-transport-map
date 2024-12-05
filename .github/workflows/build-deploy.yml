@@ -70,7 +70,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: perthtransport-${{ matrix.apps }}
-          secrets: |
+          build-args: |
             VITE_MAPS_API_KEY=${{ secrets.VITE_MAPS_API_KEY }}
           push: true
           tags: ghcr.io/accurate0/perth-transport-map-${{ matrix.apps }}:latest,ghcr.io/accurate0/perth-transport-map-${{ matrix.apps }}:${{ github.sha }}
