@@ -11,8 +11,12 @@ spec:
   source:
     repoURL: https://github.com/Accurate0/perth-transport-map.git
     path: kubernetes
-    directory:
-      include: "*.yaml"
+    kustomize:
+      images:
+        - ghcr.io/accurate0/perth-transport-map-api=ghcr.io/accurate0/perth-transport-map-api:${ARGOCD_APP_REVISION}
+        - ghcr.io/accurate0/perth-transport-map-web=ghcr.io/accurate0/perth-transport-map-web:${ARGOCD_APP_REVISION}
+        - ghcr.io/accurate0/perth-transport-map-worker=ghcr.io/accurate0/perth-transport-map-worker:${ARGOCD_APP_REVISION}
+
   destination:
     server: https://kubernetes.default.svc
     namespace: perth-transport-map
