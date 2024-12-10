@@ -18,7 +18,7 @@ export const useGetRouteColour = () => {
     () => (routeName: RouteName) => {
       switch (routeName) {
         case "Ellenbrook Line":
-          return "#ffffff";
+          return isDarkMode ? "#ffffff" : "#000000";
         case "Armadale Line":
         case "Thornlie Line":
           return "#fcbd12";
