@@ -4,11 +4,12 @@ import useDarkMode from "./useDarkMode";
 export type RouteName =
   | "Armadale Line"
   | "Thornlie Line"
-  | "Joondalup Line"
+  | "Yanchep Line"
   | "Midland Line"
   | "Airport Line"
   | "Mandurah Line"
-  | "Fremantle Line";
+  | "Fremantle Line"
+  | "Ellenbrook Line";
 
 export const useGetRouteColour = () => {
   const { isDarkMode } = useDarkMode();
@@ -16,10 +17,12 @@ export const useGetRouteColour = () => {
   return useMemo(
     () => (routeName: RouteName) => {
       switch (routeName) {
+        case "Ellenbrook Line":
+          return "#ffffff";
         case "Armadale Line":
         case "Thornlie Line":
           return "#fcbd12";
-        case "Joondalup Line":
+        case "Yanchep Line":
           return "#91a333";
         case "Midland Line":
           return "#990033";
@@ -31,6 +34,6 @@ export const useGetRouteColour = () => {
           return isDarkMode ? "#01427c" : "#000099";
       }
     },
-    [isDarkMode]
+    [isDarkMode],
   );
 };
