@@ -21,18 +21,20 @@ pub async fn handle_active_trains(
         tracing::info!("caching currently active trains");
         let trains = [
             "PerthRestricted:RTG_16",
-            // Midland Line
+            // Ellenbrook Line
             "PerthRestricted:RTG_15",
-            // Armadale Line
-            "PerthRestricted:RTG_12",
             // Mandurah Line
+            "PerthRestricted:RTG_12",
+            // Airport Line
             "PerthRestricted:RTG_14",
-            // Thornlie Line
+            // Midland Line
             "PerthRestricted:RTG_13",
-            // Fremantle Line
+            // Armadale Line
             "PerthRestricted:RTG_11",
-            // Joondalup Line
+            // Fremantle Line
             "PerthRestricted:RTG_10",
+            // Yanchep Line
+            "PerthRestricted:RTG_9",
         ];
 
         let live_trip_ids: Vec<String> = join_all(trains.into_iter().map(|timetable_id| {
@@ -40,12 +42,10 @@ pub async fn handle_active_trains(
         }))
         .await
         .iter()
-        .map(|x| {
+        .inspect(|&x| {
             if x.is_err() {
                 tracing::error!("error in fetching active train: {x:?}")
             }
-
-            x
         })
         .filter_map(|x| x.as_ref().ok())
         .flat_map(|x| x.live_trips.clone())

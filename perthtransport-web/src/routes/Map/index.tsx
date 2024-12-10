@@ -49,7 +49,7 @@ const MapRoute = () => {
           nextStopName: info.nextStop?.description,
           nextStopEstimated: info.nextStop?.realTimeInfo?.estimatedArrivalTime
             ? new Date(
-                `1970-01-01T${info.nextStop.realTimeInfo.estimatedArrivalTime}`
+                `1970-01-01T${info.nextStop.realTimeInfo.estimatedArrivalTime}`,
               )
             : undefined,
         },
@@ -70,19 +70,19 @@ const MapRoute = () => {
         : lightStyles) as google.maps.MapTypeStyle[],
       restriction: {
         latLngBounds: {
-          north: -31.61983458918886,
+          north: -31.51983458918886,
           south: -32.56142128884333,
           west: 114.8536535903477,
           east: 116.59953695847219,
         },
       },
     }),
-    [isDarkMode]
+    [isDarkMode],
   );
 
   const mapCenter = useMemo(
     () => ({ lat: -31.957250462794217, lng: 115.86367878837541 }),
-    []
+    [],
   );
 
   const zoomLevel = 11;
@@ -117,7 +117,7 @@ const MapRoute = () => {
                 fillOpacity: 1,
                 anchor: new google.maps.Point(
                   faSubway.icon[0] / 2, // width
-                  faSubway.icon[1] // height
+                  faSubway.icon[1], // height
                 ),
                 scale: 0.035,
               },
