@@ -21,3 +21,4 @@ jobs:
           image-tags: "!latest"
           keep-n-most-recent: 3
           cut-off: 3d
+          skip-shas: true
