@@ -5,6 +5,8 @@ metadata:
   namespace: perth-transport-map
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      real_ip_header CF-Connecting-IP;
 spec:
   ingressClassName: nginx
   rules:
