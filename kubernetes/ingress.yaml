@@ -15,7 +15,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: perth-transport-map
+                name: perth-transport-map-web
                 port:
                   name: web
     - host: api.perthtransport.xyz
@@ -25,7 +25,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: perth-transport-map
+                name: perth-transport-map-api
                 port:
                   name: api
   tls:

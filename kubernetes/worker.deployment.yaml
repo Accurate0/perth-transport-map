@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perth-transport-map-worker
+  namespace: perth-transport-map
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
+spec:
+  selector:
+    matchLabels:
+      app: perth-transport-map-worker
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: perth-transport-map-worker
+    spec:
+      containers:
+        - name: perth-transport-map-worker
+          image: ghcr.io/accurate0/perth-transport-map-worker:latest
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: perth-transport-map-managed-secrets
+          ports:
+            - containerPort: 8001

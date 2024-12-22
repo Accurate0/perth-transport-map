@@ -6,3 +6,9 @@ resources:
 - namespace.yaml
 - secret.yaml
 - service.yaml
+- api.deployment.yaml
+- api.service.yaml
+- web.deployment.yaml
+- web.service.yaml
+- worker.deployment.yaml
+- worker.service.yaml

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: perth-transport-map-web
+  namespace: perth-transport-map
+spec:
+  selector:
+    app: perth-transport-map-web
+  ports:
+    - name: web
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
