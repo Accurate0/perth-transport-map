@@ -9,12 +9,19 @@ spec:
   selector:
     matchLabels:
       app: perth-transport-map-web
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
         app: perth-transport-map-web
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: perth-transport-map-web
+              topologyKey: kubernetes.io/hostname
       containers:
         - name: perth-transport-map-web
           image: ghcr.io/accurate0/perth-transport-map-web:latest

@@ -13,12 +13,27 @@ jobs:
       packages: write
 
     steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch multi-platform package version SHAs
+        id: multi-arch-digests
+        run: |
+          web=$(docker manifest inspect ghcr.io/accurate0/perth-transport-map-web | jq -r '.manifests.[] | .digest' | paste -s -d ' ' -)
+          api=$(docker manifest inspect ghcr.io/accurate0/perth-transport-map-api | jq -r '.manifests.[] | .digest' | paste -s -d ' ' -)
+          worker=$(docker manifest inspect ghcr.io/accurate0/perth-transport-map-worker | jq -r '.manifests.[] | .digest' | paste -s -d ' ' -)
+          echo "multi-arch-digests=$web,$api,$worker" >> $GITHUB_OUTPUT
+
       - uses: snok/container-retention-policy@v3.0.0
         with:
           account: user
           token: ${{ secrets.GITHUB_TOKEN }}
-          image-names: "maccas-web maccas-dashboard maccas-migration maccas-api maccas-batch maccas-event"
+          image-names: "perth-transport-map-api perth-transport-map-worker perth-transport-map-web"
           image-tags: "!latest"
           keep-n-most-recent: 3
           cut-off: 3d
-          skip-shas: true
+          skip-shas: ${{ steps.multi-arch-digests.outputs.multi-arch-digests }}
