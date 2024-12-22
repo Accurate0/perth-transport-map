@@ -4,11 +4,13 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: ./perthtransport-api/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        - BINARY_NAME=perthtransport-api
     container_name: perthtransport-api
     environment:
       - PTA_REDIS_CONNECTION_STRING=redis://redis-connection
-      - PTA_WORKER_API_BASE=http://worker:8000/v1
+      - PTA_WORKER_API_BASE=http://worker:8001/v1
       - PTA_REALTIME_API_KEY
       - PTA_REFERENCE_DATA_API_KEY
       - RUST_LOG
@@ -24,7 +26,9 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: ./perthtransport-worker/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        - BINARY_NAME=perthtransport-worker
     container_name: perthtransport-worker
     environment:
       - PTA_REALTIME_API_KEY

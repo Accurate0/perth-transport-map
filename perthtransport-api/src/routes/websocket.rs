@@ -66,56 +66,7 @@ async fn handle_outgoing(
 ) -> Result<(), anyhow::Error> {
     let channel = format!("{}_{}", PUBSUB_CHANNEL_OUT_PREFIX, socket_id);
     let mut pubsub = state.message_bus.subscribe(&[&channel]).await?;
-
-    tracing::info!("subscribed: {}", channel);
-
-    while let Some(msg) = pubsub.on_message().next().await {
-        let payload = msg.get_payload()?;
-        tracing::info!("message recieved");
-        let _ = sender.send(Message::Text(payload)).await;
-    }
-
-    Ok(())
-}
-
-async fn handle_valid_message(
-    socket_id: String,
-    who: SocketAddr,
-    message_bus: MessageBus,
-    m: String,
-) -> Result<(), anyhow::Error> {
-    let message_result = serde_json::from_str::<WebSocketMessage>(&m);
-    if let Ok(websocket_message) = message_result {
-        message_bus
-            .publish(
-                PUBSUB_CHANNEL_GENERAL_IN,
-                PubSubMessage {
-                    // TODO: other message types
-                    action: PubSubAction::TripAdd,
-                    socket_id: socket_id.clone(),
-                    trip_id: Some(websocket_message.trip_id),
-                },
-            )
-            .await?;
-        tracing::info!("PubSubAction::TripAdd: message sent");
-    } else {
-        tracing::info!(
-            "client: {} sent invalid payload - {} - {:?}",
-            who,
-            m,
-            message_result.err()
-        );
-    }
-
-    Ok(())
-}
-
-async fn handle_incoming(
-    mut receiver: SplitStream<WebSocket>,
-    who: SocketAddr,
-    state: State<AppState>,
-    socket_id: String,
-) -> Result<(), anyhow::Error> {
+    tracing::info!("we're subscribed, sending hello");
     state
         .message_bus
         .publish(
@@ -127,8 +78,45 @@ async fn handle_incoming(
             },
         )
         .await?;
-    tracing::info!("PubSubAction::Hello: message sent");
 
+    tracing::info!("subscribed: {}", channel);
+
+    while let Some(msg) = pubsub.on_message().next().await {
+        let payload = msg.get_payload()?;
+        let _ = sender.send(Message::Text(payload)).await;
+    }
+
+    Ok(())
+}
+
+async fn handle_valid_message(
+    _socket_id: String,
+    who: SocketAddr,
+    _message_bus: MessageBus,
+    m: String,
+) -> Result<(), anyhow::Error> {
+    let message_result = serde_json::from_str::<WebSocketMessage>(&m);
+    match message_result {
+        Ok(websocket_message) => match websocket_message {},
+        Err(_) => {
+            tracing::info!(
+                "client: {} sent invalid payload - {} - {:?}",
+                who,
+                m,
+                message_result.err()
+            );
+        }
+    }
+
+    Ok(())
+}
+
+async fn handle_incoming(
+    mut receiver: SplitStream<WebSocket>,
+    who: SocketAddr,
+    state: State<AppState>,
+    socket_id: String,
+) -> Result<(), anyhow::Error> {
     while let Some(message) = receiver.next().await {
         match message {
             Ok(m) => match m {

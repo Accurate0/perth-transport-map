@@ -14,6 +14,7 @@ const useWebSocket = (onMessage: (data: string) => void) => {
     };
 
     socket.onmessage = (ev) => onMessage(ev.data);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { socket, isReady };

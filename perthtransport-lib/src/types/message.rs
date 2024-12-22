@@ -5,9 +5,7 @@ use super::response::realtime::RealTimeResponse;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct WebSocketMessage {
-    pub trip_id: String,
-}
+pub enum WebSocketMessage {}
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
