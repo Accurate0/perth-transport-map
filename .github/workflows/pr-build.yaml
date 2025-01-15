@@ -1,0 +1,37 @@
+name: PR Build
+on:
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        apps: [api, worker, web]
+
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker build
+        if: ${{ matrix.apps == 'api' || matrix.apps == 'worker' }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          build-args: |
+            BINARY_NAME=perthtransport-${{ matrix.apps }}
+
+      - name: Docker build
+        if: ${{ matrix.apps  == 'web' }}
+        uses: docker/build-push-action@v5
+        with:
+          context: perthtransport-${{ matrix.apps }}
+          build-args: |
+            VITE_MAPS_API_KEY=testing
+          push: false
