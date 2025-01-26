@@ -36,10 +36,10 @@ function animateMarkerTo(
   }
 
   const animateStep = function (marker: AnimatedMarker, startTime: number) {
-    const ellapsedTime = new Date().getTime() - startTime;
-    const durationRatio = ellapsedTime / options.duration; // 0 - 1
+    const elapsedTime = new Date().getTime() - startTime;
+    const durationRatio = elapsedTime / options.duration; // 0 - 1
     const easingDurationRatio = options.easing(
-      ellapsedTime,
+      elapsedTime,
       0,
       1,
       options.duration
@@ -88,16 +88,18 @@ export const AnimatedMarker: React.FC<AnimatedMarkerProps> = ({
   infoWindowContents,
   ...props
 }) => {
-  const markerRef = useRef<google.maps.Marker>();
+  const markerRef = useRef<google.maps.Marker | undefined>(undefined);
   const [position, setPosition] = useState(props.position);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    animateMarkerTo(
-      markerRef.current as AnimatedMarker,
-      props.position as google.maps.LatLng,
-      setPosition
-    );
+    if(markerRef) {
+      animateMarkerTo(
+        markerRef.current as AnimatedMarker,
+        props.position as google.maps.LatLng,
+        setPosition
+      );
+    }
   }, [props.position]);
 
   return (
