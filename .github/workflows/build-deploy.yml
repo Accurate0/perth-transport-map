@@ -37,7 +37,7 @@ jobs:
           key: ${{ runner.os }}-app-target-${{ hashFiles('**/Cargo.lock') }}-${{ matrix.apps }}
 
       - name: inject /app/target into docker
-        uses: reproducible-containers/buildkit-cache-dance@v2.1.4
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.2
         with:
           cache-source: app-target
           cache-target: /app/${{ matrix.apps }}-build/target/
@@ -48,7 +48,7 @@ jobs:
           key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}-${{ matrix.apps }}
 
       - name: inject /usr/local/cargo/registry/ into docker
-        uses: reproducible-containers/buildkit-cache-dance@v2.1.4
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.2
         with:
           cache-source: cargo-registry
           cache-target: /usr/local/cargo/registry/
