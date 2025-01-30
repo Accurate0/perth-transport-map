@@ -11,7 +11,7 @@ use std::{sync::Arc, time::SystemTime};
 use tokio::sync::Mutex;
 
 lazy_static! {
-    pub static ref RNG: Arc<Mutex<SmallRng>> = Arc::new(Mutex::new(SmallRng::from_entropy()));
+    pub static ref RNG: Arc<Mutex<SmallRng>> = Arc::new(Mutex::new(SmallRng::from_os_rng()));
     static ref SHA1: Mutex<Sha1> = Mutex::new(Sha1::new());
     pub static ref B64: Arc<GeneralPurpose> = Arc::new(base64::engine::GeneralPurpose::new(
         &alphabet::STANDARD,
@@ -30,7 +30,7 @@ pub async fn generate_realtime_auth_header(
 
     let mut rng = RNG.lock().await;
     let nonce: String = (0..6)
-        .map(|_| (rng.gen_range(0f64..1f64) * 10f64).floor() as i8 % 10)
+        .map(|_| (rng.random_range(0f64..1f64) * 10f64).floor() as i8 % 10)
         .map(|i| i.to_string())
         .collect::<Vec<_>>()
         .join("");
