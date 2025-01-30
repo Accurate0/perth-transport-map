@@ -82,8 +82,8 @@ async fn handle_outgoing(
     tracing::info!("subscribed: {}", channel);
 
     while let Some(msg) = pubsub.on_message().next().await {
-        let payload = msg.get_payload()?;
-        let _ = sender.send(Message::Text(payload)).await;
+        let payload = msg.get_payload::<String>()?;
+        let _ = sender.send(Message::Text(payload.into())).await;
     }
 
     Ok(())
@@ -121,8 +121,13 @@ async fn handle_incoming(
         match message {
             Ok(m) => match m {
                 Message::Text(m) => {
-                    handle_valid_message(socket_id.clone(), who, state.message_bus.clone(), m)
-                        .await?;
+                    handle_valid_message(
+                        socket_id.clone(),
+                        who,
+                        state.message_bus.clone(),
+                        m.to_string(),
+                    )
+                    .await?;
                 }
                 Message::Close(_) => {
                     state
