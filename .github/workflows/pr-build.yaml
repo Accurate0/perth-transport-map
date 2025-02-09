@@ -1,6 +1,9 @@
-name: PR Build
+name: PR & Push Build
 on:
   pull_request:
+  push:
+    branches-ignore:
+      - main
 
 jobs:
   build:
