@@ -25,6 +25,6 @@ http = "1.2.0"
 redis = { version = "0.28.0", features = ["aio", "connection-manager"] }
 reqwest-tracing = "0.5.4"
 task-local-extensions = "0.1.4"
-tracing-opentelemetry = "0.28.0"
-opentelemetry = "0.27.1"
+tracing-opentelemetry = "0.29.0"
+opentelemetry = "0.28.0"
 axum = { version = "0.8.0", features = ["tracing", "tokio"] }
