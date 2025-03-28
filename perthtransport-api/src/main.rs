@@ -30,7 +30,7 @@ mod types;
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
-    perthtransport::log::init_logger();
+    perthtransport::log::init_logger("api");
     let config = perthtransport::config::get_application_config()?;
 
     let redis = redis::Client::open(config.redis_connection_string.clone())?;
