@@ -1,6 +1,7 @@
 use http::{HeaderMap, HeaderValue};
 use opentelemetry::{global, trace::TracerProvider, KeyValue};
 use opentelemetry_otlp::{WithExportConfig, WithHttpConfig};
+use opentelemetry_sdk::propagation::TraceContextPropagator;
 use opentelemetry_sdk::{
     trace::BatchConfigBuilder,
     trace::{BatchSpanProcessor, Tracer},
@@ -14,8 +15,9 @@ use reqwest::{Request, Response};
 use reqwest_tracing::{default_on_request_end, reqwest_otel_span, ReqwestOtelSpanBackend};
 use std::time::Duration;
 use tokio::time::Instant;
+use tracing::Level;
 use tracing::Span;
-use tracing_subscriber::EnvFilter;
+use tracing_subscriber::{filter::Targets, layer::SubscriberExt, util::SubscriberInitExt};
 
 const INGEST_URL: &str = "https://api.axiom.co/v1/traces";
 
@@ -89,12 +91,7 @@ pub fn external_tracer(name: &'static str) -> Tracer {
     tracer
 }
 
-#[cfg(not(debug_assertions))]
 pub fn init_logger(name: &'static str) {
-    use opentelemetry_sdk::propagation::TraceContextPropagator;
-    use tracing::Level;
-    use tracing_subscriber::{filter::Targets, layer::SubscriberExt, util::SubscriberInitExt};
-
     let tracer = external_tracer(name);
 
     opentelemetry::global::set_text_map_propagator(TraceContextPropagator::new());
@@ -108,15 +105,6 @@ pub fn init_logger(name: &'static str) {
         )
         .with(tracing_opentelemetry::layer().with_tracer(tracer))
         .init();
-}
-
-#[cfg(debug_assertions)]
-pub fn init_logger(_: &'static str) {
-    tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env())
-        .with_max_level(tracing::Level::INFO)
-        .with_thread_ids(true)
-        .init()
 }
 
 pub struct TimeTrace;
