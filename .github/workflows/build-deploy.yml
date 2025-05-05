@@ -37,7 +37,7 @@ jobs:
 
   deploy:
     needs:
-      - build-backed
+      - build-backend
       - build-web
     uses: Accurate0/workflows/.github/workflows/deploy-app-k8s.yaml@main
     with:
