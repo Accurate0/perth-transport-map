@@ -30,7 +30,7 @@ jobs:
     uses: Accurate0/workflows/.github/workflows/build-push-docker.yaml@main
     with:
       directory: perthtransport-web
-      image-name: perth-transport-map-${{ matrix.apps }}
+      image-name: perth-transport-map-web
       docker-build-args: |
         BINARY_NAME=${{ matrix.apps }}
       use-rust-caching: false
