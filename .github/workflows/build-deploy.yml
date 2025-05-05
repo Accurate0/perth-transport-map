@@ -6,89 +6,39 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-backend:
     strategy:
       fail-fast: false
       matrix:
-        apps: [api, worker, web]
+        apps: [api, worker]
 
     permissions:
       packages: write
 
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+    uses: Accurate0/workflows/.github/workflows/build-push-docker.yaml@main
+    with:
+      directory: .
+      image-name: perth-transport-map-${{ matrix.apps }}
+      docker-build-args: |
+        BINARY_NAME=perthtransport-${{ matrix.apps }}
+      use-rust-caching: true
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+  build-web:
+    permissions:
+      packages: write
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/cache@v4
-        with:
-          path: app-target
-          key: ${{ runner.os }}-app-target-${{ hashFiles('**/Cargo.lock') }}-${{ matrix.apps }}
-
-      - name: inject /app/target into docker
-        uses: reproducible-containers/buildkit-cache-dance@v3.2.0
-        with:
-          cache-source: app-target
-          cache-target: /app/${{ matrix.apps }}-build/target/
-
-      - uses: actions/cache@v4
-        with:
-          path: cargo-registry
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}-${{ matrix.apps }}
-
-      - name: inject /usr/local/cargo/registry/ into docker
-        uses: reproducible-containers/buildkit-cache-dance@v3.2.0
-        with:
-          cache-source: cargo-registry
-          cache-target: /usr/local/cargo/registry/
-
-      - name: Docker build
-        if: ${{ matrix.apps == 'api' || matrix.apps == 'worker' }}
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/accurate0/perth-transport-map-${{ matrix.apps }}:latest,ghcr.io/accurate0/perth-transport-map-${{ matrix.apps }}:${{ github.sha }}
-          build-args: |
-            BINARY_NAME=perthtransport-${{ matrix.apps }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
-
-      - name: Docker build
-        if: ${{ matrix.apps  == 'web' }}
-        uses: docker/build-push-action@v6
-        with:
-          context: perthtransport-${{ matrix.apps }}
-          build-args: |
-            VITE_MAPS_API_KEY=${{ secrets.VITE_MAPS_API_KEY }}
-          push: true
-          tags: ghcr.io/accurate0/perth-transport-map-${{ matrix.apps }}:latest,ghcr.io/accurate0/perth-transport-map-${{ matrix.apps }}:${{ github.sha }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
-
-      # This ugly bit is necessary if you don't want your cache to grow forever
-      # till it hits GitHub's limit of 5GB.
-      # Temp fix
-      # https://github.com/docker/build-push-action/issues/252
-      # https://github.com/moby/buildkit/issues/1896
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+    uses: Accurate0/workflows/.github/workflows/build-push-docker.yaml@main
+    with:
+      directory: perthtransport-web
+      image-name: perth-transport-map-${{ matrix.apps }}
+      docker-build-args: |
+        BINARY_NAME=${{ matrix.apps }}
+      use-rust-caching: false
 
   deploy:
-    needs: build
+    needs:
+      - build-backed
+      - build-web
     uses: Accurate0/workflows/.github/workflows/deploy-app-k8s.yaml@main
     with:
       application-name: perth-transport-map
