@@ -32,7 +32,7 @@ jobs:
       directory: perthtransport-web
       image-name: perth-transport-map-web
       docker-build-args: |
-        BINARY_NAME=${{ matrix.apps }}
+        VITE_MAPS_API_KEY=${{ secrets.VITE_MAPS_API_KEY }}
       use-rust-caching: false
 
   deploy:
