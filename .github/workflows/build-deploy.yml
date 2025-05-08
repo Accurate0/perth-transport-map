@@ -27,13 +27,30 @@ jobs:
     permissions:
       packages: write
 
-    uses: Accurate0/workflows/.github/workflows/build-push-docker.yaml@main
-    with:
-      directory: perthtransport-web
-      image-name: perth-transport-map-web
-      docker-build-args: |
-        VITE_MAPS_API_KEY=${{ secrets.VITE_MAPS_API_KEY }}
-      use-rust-caching: false
+    steps:
+      - name: Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+          version: 1.76.6
+
+      - uses: Infisical/secrets-action@v1.0.9
+        with:
+          method: "oidc"
+          identity-id: "21b66a5a-6311-483a-b378-071b99966b73"
+          domain: "https://vault.inf-k8s.net"
+          env-slug: "prod"
+          project-slug: "perth-transport-map-41-jp"
+
+      - uses: Accurate0/workflows/.github/workflows/build-push-docker.yaml@main
+        with:
+          directory: perthtransport-web
+          image-name: perth-transport-map-web
+          docker-build-args: |
+            VITE_MAPS_API_KEY=${{ secrets.VITE_MAPS_API_KEY }}
+          use-rust-caching: false
 
   deploy:
     needs:
