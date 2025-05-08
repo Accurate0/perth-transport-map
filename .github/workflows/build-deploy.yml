@@ -28,29 +28,23 @@ jobs:
       packages: write
 
     steps:
-      - name: Tailscale
-        uses: tailscale/github-action@v3
+      - name: Docker build
+        uses: docker/build-push-action@v6
+        env:
+          DOCKER_BUILD_RECORD_UPLOAD: false
         with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          tags: tag:ci
-          version: 1.76.6
-
-      - uses: Infisical/secrets-action@v1.0.9
-        with:
-          method: "oidc"
-          identity-id: "21b66a5a-6311-483a-b378-071b99966b73"
-          domain: "https://vault.inf-k8s.net"
-          env-slug: "prod"
-          project-slug: "perth-transport-map-41-jp"
-
-      - uses: Accurate0/workflows/.github/workflows/build-push-docker.yaml@main
-        with:
-          directory: perthtransport-web
-          image-name: perth-transport-map-web
-          docker-build-args: |
+          context: ${{ inputs.directory }}
+          push: true
+          tags: ghcr.io/accurate0/perth-transport-map-web:latest,ghcr.io/accurate0/perth-transport-map-web:${{ github.sha }}
+          build-args: |
             VITE_MAPS_API_KEY=${{ secrets.VITE_MAPS_API_KEY }}
-          use-rust-caching: false
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   deploy:
     needs:
