@@ -26,6 +26,7 @@ jobs:
   build-web:
     permissions:
       packages: write
+    runs-on: ubuntu-latest
 
     steps:
       - name: Docker build
