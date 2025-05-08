@@ -33,7 +33,7 @@ jobs:
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
         with:
-          context: ${{ inputs.directory }}
+          context: perthtransport-web
           push: true
           tags: ghcr.io/accurate0/perth-transport-map-web:latest,ghcr.io/accurate0/perth-transport-map-web:${{ github.sha }}
           build-args: |
