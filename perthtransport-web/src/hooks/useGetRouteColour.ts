@@ -3,7 +3,7 @@ import useDarkMode from "./useDarkMode";
 
 export type RouteName =
   | "Armadale Line"
-  | "Thornlie Line"
+  | "Thornlie-Cockburn Line"
   | "Yanchep Line"
   | "Midland Line"
   | "Airport Line"
@@ -20,7 +20,7 @@ export const useGetRouteColour = () => {
         case "Ellenbrook Line":
           return isDarkMode ? "#d32737" : "#d32838";
         case "Armadale Line":
-        case "Thornlie Line":
+        case "Thornlie-Cockburn Line":
           return "#fcbd12";
         case "Yanchep Line":
           return "#91a333";
