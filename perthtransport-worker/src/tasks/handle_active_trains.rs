@@ -20,14 +20,15 @@ pub async fn handle_active_trains(
     loop {
         tracing::info!("caching currently active trains");
         let trains = [
-            "PerthRestricted:RTG_16",
             // Ellenbrook Line
-            "PerthRestricted:RTG_15",
-            // Mandurah Line
-            "PerthRestricted:RTG_12",
+            "PerthRestricted:RTG_16",
             // Airport Line
-            "PerthRestricted:RTG_14",
+            "PerthRestricted:RTG_15",
+            // Thornlie-Cockburn Line
+            "PerthRestricted:RTG_12",
             // Midland Line
+            "PerthRestricted:RTG_14",
+            // Mandurah Line
             "PerthRestricted:RTG_13",
             // Armadale Line
             "PerthRestricted:RTG_11",
