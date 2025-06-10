@@ -7,7 +7,7 @@ edition = "2021"
 perthtransport = { path = "../perthtransport-lib" }
 
 config = "0.15.0"
-redis = { version = "0.31.0", features = ["tokio-comp", "aio"] }
+redis = { version = "0.32.0", features = ["tokio-comp", "aio"] }
 tokio = { version = "1.42.0", features = ["rt", "macros", "rt-multi-thread"] }
 anyhow = "1.0.94"
 serde = "1.0.215"
