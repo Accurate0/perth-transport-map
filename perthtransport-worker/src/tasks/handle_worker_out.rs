@@ -24,7 +24,7 @@ pub async fn handle_worker_out(
 
                 let json_string = serde_json::to_string(&message.response)?;
 
-                redis
+                let _: () = redis
                     .set_ex(
                         format!("{}_{}", CACHE_KEY_PREFIX, trip_id),
                         &json_string,
@@ -59,7 +59,7 @@ pub async fn handle_worker_out(
             WorkerMessage::DoNotTrack(trip_id) => {
                 let expiry = 100;
                 tracing::info!("setting {} to Do Not Track for {} seconds", trip_id, expiry);
-                redis
+                let _: () = redis
                     .set_ex(
                         format!("{}_{}", DO_NOT_TRACK_KEY_PREFIX, trip_id),
                         "",

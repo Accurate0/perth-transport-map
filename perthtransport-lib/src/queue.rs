@@ -14,7 +14,7 @@ impl MessageBus {
     pub async fn new(client: redis::Client) -> Result<Self, anyhow::Error> {
         Ok(Self {
             redis_client: client.clone(),
-            redis_connection: Arc::new(client.get_tokio_connection_manager().await?.into()),
+            redis_connection: Arc::new(client.get_connection_manager().await?.into()),
         })
     }
 
@@ -25,7 +25,7 @@ impl MessageBus {
     ) -> Result<(), anyhow::Error> {
         let mut redis_connection = self.redis_connection.lock().await;
         let channel = format!("{}_{}", PUBSUB_CHANNEL_OUT_PREFIX, socket_id);
-        redis_connection
+        let _: () = redis_connection
             .publish(channel, serde_json::to_string(&message)?)
             .await?;
 
@@ -38,7 +38,7 @@ impl MessageBus {
         message: T,
     ) -> Result<(), anyhow::Error> {
         let mut redis_connection = self.redis_connection.lock().await;
-        redis_connection
+        let _: () = redis_connection
             .publish(channel, serde_json::to_string(&message)?)
             .await?;
 

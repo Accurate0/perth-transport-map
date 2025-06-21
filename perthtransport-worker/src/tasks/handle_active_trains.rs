@@ -2,7 +2,7 @@ use crate::{task_manager::TaskManager, tasks::handle_trip};
 use flume::Sender;
 use futures_util::future::join_all;
 use perthtransport::{
-    constants::{ACTIVE_TRAINS_KEY, ACTIVE_TRAIN_THREAD_SLEEP},
+    constants::{ACTIVE_TRAIN_THREAD_SLEEP, ACTIVE_TRAINS_KEY},
     query,
     types::{config::ApplicationConfig, message::WorkerMessage},
 };
@@ -54,7 +54,7 @@ pub async fn handle_active_trains(
 
         tracing::info!("there are {} currently active trains", live_trip_ids.len());
         // set in cache
-        redis_multiplexed
+        let _: () = redis_multiplexed
             .set(ACTIVE_TRAINS_KEY, serde_json::to_string(&live_trip_ids)?)
             .await?;
 

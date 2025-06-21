@@ -10,7 +10,7 @@ pub struct WorkerHealthStatus {
     pub active_trains_healthy: bool,
 }
 
-// error type that converts any error into service unavailble
+#[allow(unused)]
 pub struct ServiceUnavailable(anyhow::Error);
 impl IntoResponse for ServiceUnavailable {
     fn into_response(self) -> Response {
