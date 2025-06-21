@@ -1,4 +1,4 @@
-FROM node:20.11.1-alpine3.19 AS build
+FROM node:23.3.0-alpine3.19 AS build
 ARG VITE_MAPS_API_KEY
 
 WORKDIR /app
