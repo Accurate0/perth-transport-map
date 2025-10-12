@@ -6,7 +6,7 @@ metadata:
   name: ptm-gateway
   namespace: perth-transport-map
 spec:
-  gatewayClassName: nginx
+  gatewayClassName: envoy-gateway
   listeners:
     - hostname: api.perthtransport.xyz
       name: api-perthtransport-xyz-https
