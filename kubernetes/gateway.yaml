@@ -1,0 +1,26 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  name: ptm-gateway
+  namespace: perth-transport-map
+spec:
+  gatewayClassName: nginx
+  listeners:
+    - hostname: api.perthtransport.xyz
+      name: api-perthtransport-xyz-https
+      port: 8443
+      protocol: HTTPS
+      tls:
+        certificateRefs:
+          - kind: Secret
+            name: api-perth-transport-map-tls
+    - hostname: perthtransport.xyz
+      name: perthtransport-xyz-https
+      port: 8443
+      protocol: HTTPS
+      tls:
+        certificateRefs:
+          - kind: Secret
+            name: perth-transport-map-tls
