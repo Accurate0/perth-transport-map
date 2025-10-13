@@ -1,9 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - gateway.yaml
   - httproute.yaml
-  - client.policy.yaml
   - namespace.yaml
   - secret.yaml
   - api.deployment.yaml
