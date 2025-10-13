@@ -7,7 +7,8 @@ spec:
   hostnames:
     - api.perthtransport.xyz
   parentRefs:
-    - name: ptm-gateway
+    - name: shared-gateway
+      namespace: envoy-gateway-system
   rules:
     - backendRefs:
         - name: perth-transport-map-api
@@ -26,7 +27,8 @@ spec:
   hostnames:
     - perthtransport.xyz
   parentRefs:
-    - name: ptm-gateway
+    - name: shared-gateway
+      namespace: envoy-gateway-system
   rules:
     - backendRefs:
         - name: perth-transport-map-web
