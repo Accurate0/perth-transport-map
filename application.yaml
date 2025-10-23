@@ -9,14 +9,14 @@ spec:
       - CreateNamespace=true
   project: default
   sources:
-    - chart: secured-http-route
+    - chart: k8s-http-routes
       repoURL: https://accurate0.github.io/inf-k8s
-      targetRevision: 0.3.0
+      targetRevision: 1.2.0
       helm:
         valuesObject:
           routes:
             - name: api-route
-              useBouncer: true
+              crowdsecBouncer: true
               gateway:
                 name: shared-gateway
                 namespace: envoy-gateway-system
@@ -31,7 +31,7 @@ spec:
                         type: PathPrefix
                         value: /
             - name: web-route
-              useBouncer: true
+              crowdsecBouncer: true
               gateway:
                 name: shared-gateway
                 namespace: envoy-gateway-system
