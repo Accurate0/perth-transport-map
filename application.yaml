@@ -8,14 +8,50 @@ spec:
     syncOptions:
       - CreateNamespace=true
   project: default
-  source:
-    repoURL: https://github.com/Accurate0/perth-transport-map.git
-    path: kubernetes
-    kustomize:
-      images:
-        - ghcr.io/accurate0/perth-transport-map-api=ghcr.io/accurate0/perth-transport-map-api:${ARGOCD_APP_REVISION}
-        - ghcr.io/accurate0/perth-transport-map-web=ghcr.io/accurate0/perth-transport-map-web:${ARGOCD_APP_REVISION}
-        - ghcr.io/accurate0/perth-transport-map-worker=ghcr.io/accurate0/perth-transport-map-worker:${ARGOCD_APP_REVISION}
+  sources:
+    - chart: secured-http-route
+      repoURL: https://accurate0.github.io/inf-k8s
+      targetRevision: 0.2.0
+      helm:
+        valuesObject:
+          routes:
+            - name: api-route
+              useBouncer: true
+              gateway:
+                name: shared-gateway
+                namespace: envoy-gateway-system
+              hostnames:
+                - api.perthtransport.xyz
+              rules:
+                - backendRefs:
+                    - name: perth-transport-map-api
+                      port: 8000
+                  matches:
+                    - path:
+                        type: PathPrefix
+                        value: /
+            - name: web-route
+              useBouncer: true
+              gateway:
+                name: shared-gateway
+                namespace: envoy-gateway-system
+              hostnames:
+                - perthtransport.xyz
+              rules:
+                - backendRefs:
+                    - name: perth-transport-map-web
+                      port: 3000
+                  matches:
+                    - path:
+                        type: PathPrefix
+                        value: /
+    - repoURL: https://github.com/Accurate0/perth-transport-map.git
+      path: kubernetes
+      kustomize:
+        images:
+          - ghcr.io/accurate0/perth-transport-map-api=ghcr.io/accurate0/perth-transport-map-api:${ARGOCD_APP_REVISION}
+          - ghcr.io/accurate0/perth-transport-map-web=ghcr.io/accurate0/perth-transport-map-web:${ARGOCD_APP_REVISION}
+          - ghcr.io/accurate0/perth-transport-map-worker=ghcr.io/accurate0/perth-transport-map-worker:${ARGOCD_APP_REVISION}
 
   destination:
     server: https://kubernetes.default.svc
