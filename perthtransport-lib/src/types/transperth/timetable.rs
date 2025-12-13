@@ -30,7 +30,7 @@ pub struct PTATimetableResponse {
 #[serde(rename_all = "camelCase")]
 pub struct PTARequest {
     #[serde(rename = "ApiKey")]
-    pub api_key: String,
+    pub api_key: Option<String>,
     #[serde(rename = "Route")]
     pub route: String,
     #[serde(rename = "StartDate")]
