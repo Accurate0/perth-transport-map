@@ -19,6 +19,16 @@ spec:
         - name: perth-transport-map-worker
           image: ghcr.io/accurate0/perth-transport-map-worker:latest
           imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /v1/status/health
+              port: 8001
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
           envFrom:
             - secretRef:
                 name: perth-transport-map-managed-secrets
