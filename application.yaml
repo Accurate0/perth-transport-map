@@ -11,12 +11,11 @@ spec:
   sources:
     - chart: k8s-http-routes
       repoURL: https://accurate0.github.io/inf-k8s
-      targetRevision: 1.2.0
+      targetRevision: 2.0.0
       helm:
         valuesObject:
           routes:
             - name: api-route
-              crowdsecBouncer: true
               gateway:
                 name: shared-gateway
                 namespace: envoy-gateway-system
@@ -31,7 +30,6 @@ spec:
                         type: PathPrefix
                         value: /
             - name: web-route
-              crowdsecBouncer: true
               gateway:
                 name: shared-gateway
                 namespace: envoy-gateway-system
