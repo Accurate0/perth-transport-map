@@ -25,14 +25,18 @@ pub fn external_tracer(name: &'static str) -> Tracer {
     let mut headers = HeaderMap::<HeaderValue>::with_capacity(1);
     headers.insert(
         "User-Agent",
-        HeaderValue::from_str(&format!("maccas-api/{}", env!("CARGO_PKG_VERSION"))).unwrap(),
+        HeaderValue::from_str(&format!(
+            "perth-transport-map/{}",
+            env!("CARGO_PKG_VERSION")
+        ))
+        .unwrap(),
     );
 
     let tags = vec![
         KeyValue::new(TELEMETRY_SDK_NAME, "otel-tracing-rs".to_string()),
         KeyValue::new(TELEMETRY_SDK_VERSION, env!("CARGO_PKG_VERSION").to_string()),
         KeyValue::new(TELEMETRY_SDK_LANGUAGE, "rust".to_string()),
-        KeyValue::new(SERVICE_NAME, format!("maccas-{name}")),
+        KeyValue::new(SERVICE_NAME, format!("perth-transport-{name}")),
         KeyValue::new(
             DEPLOYMENT_ENVIRONMENT_NAME,
             if cfg!(debug_assertions) {
