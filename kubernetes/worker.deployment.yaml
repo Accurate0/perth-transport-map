@@ -29,6 +29,9 @@ spec:
             periodSeconds: 30
             successThreshold: 1
             timeoutSeconds: 1
+          env:
+            - name: OTEL_TRACING_URL
+              value: http://monitoring-tempo.monitoring.svc.cluster.local:4318/v1/traces
           envFrom:
             - secretRef:
                 name: perth-transport-map-managed-secrets

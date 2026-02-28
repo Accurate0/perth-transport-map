@@ -1,9 +1,8 @@
 use crate::{
-    constants::{TRANSPERTH_EARLY_HOURS, TRANSPERTH_TIMETABLE_ENDPOINT, TRANSPERTH_TRIP_LOOKUP},
+    constants::{TRANSPERTH_EARLY_HOURS, TRANSPERTH_TIMETABLE_ENDPOINT},
     types::{
-        config::ApplicationConfig,
-        response::trip::LiveTripResponse,
-        transperth::{timetable::PTATimetableResponse, trip::PTATripResponse},
+        config::ApplicationConfig, response::trip::LiveTripResponse,
+        transperth::timetable::PTATimetableResponse,
     },
 };
 use anyhow::Context;
@@ -84,20 +83,23 @@ pub async fn get_live_trips_for(
         );
     }
 
-    let response = http_client
-        .get(TRANSPERTH_TRIP_LOOKUP)
-        .query(&[
-            ("OperatingDate", datetime.as_str()),
-            ("format", "json"),
-            ("_", now.to_string().as_str()),
-        ])
-        .query(&[("TripIDs", trip_ids.join(","))])
-        .send()
-        .await?
-        .error_for_status()?;
-
-    let trip_response = response.json::<PTATripResponse>().await?;
-    let live_trip_response = LiveTripResponse::from(trip_response);
+    // FIXME: doesn't work, too many trains?
+    // let response = http_client
+    //     .get(TRANSPERTH_TRIP_LOOKUP)
+    //     .query(&[
+    //         ("OperatingDate", datetime.as_str()),
+    //         ("format", "json"),
+    //         ("_", now.to_string().as_str()),
+    //     ])
+    //     .query(&[("TripIDs", trip_ids.join(","))])
+    //     .send()
+    //     .await?
+    //     .error_for_status()?;
+    //
+    // let trip_response = response.json::<PTATripResponse>().await?;
+    let live_trip_response = LiveTripResponse {
+        live_trips: trip_ids,
+    };
 
     Ok(live_trip_response)
 }

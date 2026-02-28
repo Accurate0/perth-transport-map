@@ -1,49 +1,38 @@
 use http::{HeaderMap, HeaderValue};
-use opentelemetry::{global, trace::TracerProvider, KeyValue};
-use opentelemetry_otlp::{WithExportConfig, WithHttpConfig};
+use opentelemetry::{KeyValue, global, trace::TracerProvider};
+use opentelemetry_otlp::{Protocol, WithExportConfig, WithHttpConfig};
 use opentelemetry_sdk::propagation::TraceContextPropagator;
 use opentelemetry_sdk::{
+    Resource,
     trace::BatchConfigBuilder,
     trace::{BatchSpanProcessor, Tracer},
-    Resource,
 };
 use opentelemetry_semantic_conventions::resource::{
     DEPLOYMENT_ENVIRONMENT_NAME, SERVICE_NAME, TELEMETRY_SDK_LANGUAGE, TELEMETRY_SDK_NAME,
     TELEMETRY_SDK_VERSION,
 };
 use reqwest::{Request, Response};
-use reqwest_tracing::{default_on_request_end, reqwest_otel_span, ReqwestOtelSpanBackend};
+use reqwest_tracing::{ReqwestOtelSpanBackend, default_on_request_end, reqwest_otel_span};
 use std::time::Duration;
 use tokio::time::Instant;
 use tracing::Level;
 use tracing::Span;
 use tracing_subscriber::{filter::Targets, layer::SubscriberExt, util::SubscriberInitExt};
 
-const INGEST_URL: &str = "https://api.axiom.co/v1/traces";
-
 pub fn external_tracer(name: &'static str) -> Tracer {
-    let token = std::env::var("AXIOM_TOKEN").expect("must have axiom token configured");
-    let dataset_name = std::env::var("AXIOM_DATASET").expect("must have axiom dataset configured");
+    let ingest_url = std::env::var("OTEL_TRACING_URL").unwrap();
 
-    let mut headers = HeaderMap::<HeaderValue>::with_capacity(3);
-    headers.insert(
-        "Authorization",
-        HeaderValue::from_str(&format!("Bearer {token}")).unwrap(),
-    );
-    headers.insert(
-        "X-Axiom-Dataset",
-        HeaderValue::from_str(&dataset_name).unwrap(),
-    );
+    let mut headers = HeaderMap::<HeaderValue>::with_capacity(1);
     headers.insert(
         "User-Agent",
-        HeaderValue::from_str(&format!("tracing-axiom/{}", env!("CARGO_PKG_VERSION"))).unwrap(),
+        HeaderValue::from_str(&format!("maccas-api/{}", env!("CARGO_PKG_VERSION"))).unwrap(),
     );
 
     let tags = vec![
-        KeyValue::new(TELEMETRY_SDK_NAME, "external-tracer".to_string()),
+        KeyValue::new(TELEMETRY_SDK_NAME, "otel-tracing-rs".to_string()),
         KeyValue::new(TELEMETRY_SDK_VERSION, env!("CARGO_PKG_VERSION").to_string()),
         KeyValue::new(TELEMETRY_SDK_LANGUAGE, "rust".to_string()),
-        KeyValue::new(SERVICE_NAME, name),
+        KeyValue::new(SERVICE_NAME, format!("maccas-{name}")),
         KeyValue::new(
             DEPLOYMENT_ENVIRONMENT_NAME,
             if cfg!(debug_assertions) {
@@ -71,7 +60,8 @@ pub fn external_tracer(name: &'static str) -> Tracer {
             .join()
             .unwrap(),
         )
-        .with_endpoint(INGEST_URL)
+        .with_protocol(Protocol::HttpJson)
+        .with_endpoint(ingest_url)
         .with_timeout(Duration::from_secs(3))
         .build_span_exporter()
         .unwrap();
