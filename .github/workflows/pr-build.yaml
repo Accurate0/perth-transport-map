@@ -23,7 +23,7 @@ jobs:
 
       - name: Docker build
         if: ${{ matrix.apps == 'api' || matrix.apps == 'worker' }}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: false
@@ -32,7 +32,7 @@ jobs:
 
       - name: Docker build
         if: ${{ matrix.apps  == 'web' }}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: perthtransport-${{ matrix.apps }}
           build-args: |
